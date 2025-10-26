@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require
+    username: postgres.gadsqfpnjuqunpcgwbdt
+    password: Bcdg2003.
+    driver-class-name: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 2
+    minimum-idle: 0
+    connection-timeout: 30000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  sql:
+    init:
+      mode: always
+
+
+management:
+  health:
+    mail:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+security:
+  jwt:
+    secret: "a-string-secret-at-least-256-bits-long"
+    expiration: 3600000
+    issuer: "ChartFlowApp"
+    cookie-name: "AUTH"
+    cookie-secure: true         # string değil boolean
+
+auth:
+  default-role: user
+
+server:
+  forward-headers-strategy: native
+  servlet:
+    session:
+      cookie:
+        secure: true
+        same-site: none
+  port: 8080
