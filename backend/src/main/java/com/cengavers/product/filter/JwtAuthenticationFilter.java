@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (!jwtService.isValid(token)) {
             if (log.isWarnEnabled()) log.warn("[JWT] Invalid token (signature/exp). Continuing without auth.");
-            chain.doFilter(request, response);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
