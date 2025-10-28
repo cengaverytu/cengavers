@@ -12,7 +12,8 @@ public class MessageDTOConverter {
     public MessageDTO convert(Message from) {
         return new MessageDTO(
                 from.getId(),
-                from.getContent()
+                from.getContent(),
+                from.getStatus()
         );
     }
 

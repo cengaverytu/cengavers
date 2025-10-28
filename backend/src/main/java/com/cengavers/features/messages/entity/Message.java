@@ -13,9 +13,12 @@ import lombok.NoArgsConstructor;
 public class Message {
 
     @Id
-    @Column(name = "ID")
+    @Column(name = "ID", updatable = false, nullable = false, unique = true)
     private Long id;
 
     @Column(name = "CONTENT", nullable = false, length = 500)
     private String content;
+
+    @Column(name = "STATUS")
+    private Boolean status;
 }

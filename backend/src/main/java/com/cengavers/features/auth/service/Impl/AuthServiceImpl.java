@@ -43,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
         CreateUserRequest createUserReq = new CreateUserRequest();
         createUserReq.setUsername(request.getUsername());
-        createUserReq.setPassword(passwordEncoder.encode(request.getPassword()));
+        createUserReq.setPassword(request.getPassword());
         userService.save(createUserReq);
         UserDTO saved = userService.findByUsername(request.getUsername());
 
