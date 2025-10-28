@@ -13,4 +13,5 @@ import lombok.Setter;
 public class MessageDTO {
     private Long id;
     private String content;
+    private Boolean status = false;
 }
