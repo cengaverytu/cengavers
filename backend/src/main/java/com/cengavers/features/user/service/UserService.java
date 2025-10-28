@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface UserService {
 
+    void saveAdmin(CreateUserRequest request);
+
     void save(CreateUserRequest request);
 
     void updateById(Long id, UpdateUserRequest request);

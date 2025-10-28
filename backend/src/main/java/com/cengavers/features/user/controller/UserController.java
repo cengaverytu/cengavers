@@ -25,6 +25,11 @@ public class UserController {
         userService.save(request);
         return ResponseEntity.ok().build();
     }
+    @PostMapping("/save-admin")
+    public ResponseEntity<Void> createAdmin(@RequestBody CreateUserRequest request) {
+        userService.saveAdmin(request);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {

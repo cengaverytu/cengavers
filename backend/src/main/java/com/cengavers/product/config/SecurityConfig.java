@@ -51,7 +51,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration conf = new CorsConfiguration();
 
-        conf.setAllowedOrigins(ALLOWED_ORIGINS);
+        conf.setAllowedOriginPatterns(ALLOWED_ORIGINS);
         conf.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         conf.setAllowedHeaders(List.of("*"));
         conf.setAllowCredentials(true);
@@ -73,7 +73,11 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
+                            
                                 "/api/auth/**",
                                 "/api/role/**",
                                 "/swagger-ui/**",

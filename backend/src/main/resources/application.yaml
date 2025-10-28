@@ -1,26 +1,27 @@
 spring:
   datasource:
-    url: jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require
+    url: jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require&preferQueryMode=simple
     username: postgres.gadsqfpnjuqunpcgwbdt
     password: Bcdg2003.
     driver-class-name: org.postgresql.Driver
-  hikari:
-    maximum-pool-size: 2
-    minimum-idle: 0
-    connection-timeout: 30000
-    idle-timeout: 600000
-    max-lifetime: 1800000
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 0
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 300000
+      keepalive-time: 300000
+      leak-detection-threshold: 20000
+
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+
   sql:
     init:
       mode: always
-
 
 management:
   health:
@@ -34,13 +35,22 @@ management:
     health:
       show-details: never
 
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    com.cengavers: DEBUG
+    
+
+
 security:
   jwt:
     secret: "a-string-secret-at-least-256-bits-long"
     expiration: 3600000
     issuer: "ChartFlowApp"
-    cookie-name: "AUTH"
-    cookie-secure: true         # string değil boolean
+    cookie-name: "auth"
+    cookie-secure: false
+
 
 auth:
   default-role: user
@@ -50,6 +60,6 @@ server:
   servlet:
     session:
       cookie:
-        secure: true
+        secure: false
         same-site: none
   port: 8080
