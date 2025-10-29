@@ -12,5 +12,5 @@ export type CreateMessageRequest = CreateMessageInput;
 export type MessageDTO = {
     id:number;
     content: string,
-    status: Boolean,
+    status: boolean,
 }
