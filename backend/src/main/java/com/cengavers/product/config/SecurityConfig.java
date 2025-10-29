@@ -36,7 +36,7 @@ public class SecurityConfig {
     private String cookieName;
 
     private static final List<String> ALLOWED_ORIGINS = List.of(
-            "http://localhost:*"
+            "http://localhost:*","/v3/api-docs/**", "/swagger-ui/**"
     );
 
     @Bean
@@ -79,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/messages/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/docs/**").permitAll()
                         .requestMatchers(
                                 
                                 "/api/auth/**",

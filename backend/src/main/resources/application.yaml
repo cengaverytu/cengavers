@@ -63,3 +63,10 @@ server:
         secure: false
         same-site: none
   port: 8080
+
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /docs
