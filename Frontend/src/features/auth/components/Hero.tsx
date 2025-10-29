@@ -1,43 +1,39 @@
-import { Link } from "react-router-dom";
-import img from "../assets/Mail.jpeg";
+// src/pages/ComingSoon.tsx
+import { useMessage } from "../../message/hooks/useMessage";
 
-export default function Hero() {
+export default function ComingSoon() {
+  const { data: msg, isLoading, error } = useMessage(5);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <p className="text-gray-500">Yükleniyor…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <p className="text-red-600">Mesaj alınamadı.</p>
+      </div>
+    );
+  }
+
+  if(!msg?.status){
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <p className="text-red-600">Aktif bir mesaj bulunmamaktadir</p>
+      </div>
+    );
+  }
+
   return (
+    <main className="min-h-screen grid place-items-center bg-white">
+      <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center px-6">
 
-    <section className="bg-white min-h-screen flex flex-col md:flex-row items-center justify-center gap-10 md:gap-36 px-6">
-      Coming Soon...
-    </section>
-    
-
+        {msg?.status ? msg.content : ""}
+      </h1>
+    </main>
   );
 }
-{/** 
-    <section className="bg-white min-h-screen flex flex-col md:flex-row items-center justify-center gap-10 md:gap-36 px-6">
-      <div className="flex">
-        <ul className="flex flex-col gap-6 max-w-md text-start font-custom-inter">
-          <li className="font-semibold text-3xl sm:text-4xl md:text-5xl leading-tight">
-            Automate your Mail tasks in days, not weeks
-          </li>
-          <li className="text-heroTextLight text-base sm:text-lg md:text-xl">
-            Stop wasting time on copy-paste. Create reports, clean data, and manage files automatically with ready-to-use templates.
-          </li>
-          <li>
-            <Link
-              to="/register"
-              className="inline-block mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg text-lg hover:bg-blue-700 transition"
-            >
-              Get Started
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      <div className="w-full md:w-auto flex justify-center">
-        <img
-          className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl"
-          src={img}
-          alt="hero"
-        />
-      </div>
-    </section>
-    */}
