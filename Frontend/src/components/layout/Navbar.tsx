@@ -45,6 +45,13 @@ export default function Navbar() {
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
+              <button
+                onClick={() => navigate("/announcements")}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              >
+                Duyurular
+              </button>
+
               {isAdmin(me) && (
                 <button
                   onClick={() => navigate("/admin")}
@@ -84,6 +91,16 @@ export default function Navbar() {
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  navigate("/announcements");
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg"
+              >
+                Duyurular
+              </button>
+
               {isAdmin(me) && (
                 <button
                   onClick={() => {
