@@ -30,6 +30,7 @@ public class DataInitializer {
 
             var adminUser = new User();
             adminUser.setUsername("admin");
+            adminUser.setEmail("admin@cengavers.com");
             adminUser.setPassword(passwordEncoder.encode("cengavers123."));
             adminUser.setRole(adminRole);
             return userRepository.save(adminUser);

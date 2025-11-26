@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function RegisterForm() {
   const { register, handleSubmit, formState } = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { username: "", password: "" },
+    defaultValues: { username: "", email: "", password: "" },
   });
   const { errors } = formState;
 
@@ -23,7 +23,10 @@ export default function RegisterForm() {
     setFlowError(null);
     try {
       await signUp.mutateAsync(data);
-      await signIn.mutateAsync(data);
+      await signIn.mutateAsync({ 
+        username: data.username, 
+        password: data.password 
+      });
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
       const apiMsg =
@@ -41,13 +44,25 @@ export default function RegisterForm() {
       <div className="mb-3">
         <input
           type="text"
-          placeholder="Kullanıcı adı (email olabilir)"
+          placeholder="Kullanıcı adı"
           autoComplete="username"
           {...register("username")}
           className="w-full p-2 border rounded"
           aria-invalid={!!errors.username || undefined}
         />
         {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+      </div>
+
+      <div className="mb-3">
+        <input
+          type="email"
+          placeholder="E-posta"
+          autoComplete="email"
+          {...register("email")}
+          className="w-full p-2 border rounded"
+          aria-invalid={!!errors.email || undefined}
+        />
+        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
       </div>
 
       <div className="mb-3">

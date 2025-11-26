@@ -12,6 +12,7 @@ public class UserDTOConverter {
         return new UserDTO(
                 from.getId(),
                 from.getUsername(),
+                from.getEmail(),
                 from.getRole().getId(),
                 from.getCreatedAt()
         );

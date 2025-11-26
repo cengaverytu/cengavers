@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateUserRequest extends BaseUserRequest {
     private String username;
+    private String email;
     private String password;
     private Long roleId;
 }
