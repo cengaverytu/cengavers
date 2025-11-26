@@ -1,10 +1,17 @@
 import { Navigate, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useMessages } from "../../features/message/hooks/useMessage";
+import { useActiveAnnouncements } from "../../features/announcement/hooks/useAnnouncement";
+import { AnnouncementDTO } from "../../features/announcement/types/announcement";
+import AnnouncementCard from "../../features/announcement/components/AnnouncementCard";
+import AnnouncementDetailModal from "../../features/announcement/components/AnnouncementDetailModal";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
 export default function HomePage() {
   const { data: messages } = useMessages();
+  const { data: announcements, isLoading: announcementsLoading } = useActiveAnnouncements();
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementDTO | null>(null);
   const navigate = useNavigate();
 
   const activeMessage = messages?.find(m => m.status === true);
@@ -43,9 +50,45 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Duyurular Bölümü */}
+        {announcements && announcements.length > 0 && (
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Son Duyurular
+              </h2>
+              <p className="text-gray-600">
+                Kulüplerimizden ve etkinliklerimizden haberdar olun
+              </p>
+            </div>
+            
+            {announcementsLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="text-gray-600">Yükleniyor...</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {announcements.map((announcement) => (
+                  <AnnouncementCard
+                    key={announcement.id}
+                    announcement={announcement}
+                    onClick={() => setSelectedAnnouncement(announcement)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
       </main>
 
       <Footer />
+
+      {/* Duyuru Detay Modal */}
+      <AnnouncementDetailModal
+        announcement={selectedAnnouncement}
+        onClose={() => setSelectedAnnouncement(null)}
+      />
     </div>
   );
 }

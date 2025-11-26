@@ -9,7 +9,8 @@ import AdminPanel from "./routes/AdminPanel";
 import AdminUsersPage from "./routes/AdminUsersPage";
 import Layout from "../components/layout/Layout";
 import MessagePage from "./routes/MessagePage";
-import AnnouncementsPage from "./routes/AnnouncementsPage";               
+import AnnouncementsPage from "./routes/AnnouncementsPage";
+import UserAnnouncementsPage from "./routes/UserAnnouncementsPage";               
 
 export default function Router() {
   return (
@@ -25,6 +26,14 @@ export default function Router() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/announcements"
+            element={
+              <ProtectedRoute>
+                <UserAnnouncementsPage />
               </ProtectedRoute>
             }
           />
