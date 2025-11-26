@@ -8,7 +8,8 @@ import AdminRoute from "../features/auth/components/AdminRoute";
 import AdminPanel from "./routes/AdminPanel";
 import AdminUsersPage from "./routes/AdminUsersPage";
 import Layout from "../components/layout/Layout";
-import MessagePage from "./routes/MessagePage";               
+import MessagePage from "./routes/MessagePage";
+import AnnouncementsPage from "./routes/AnnouncementsPage";               
 
 export default function Router() {
   return (
@@ -31,6 +32,7 @@ export default function Router() {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/messages" element={<MessagePage />} />
+            <Route path="/admin/announcements" element={<AnnouncementsPage />} />
           </Route>
         </Route>
 
