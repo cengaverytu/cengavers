@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
         Role role = roleService.findByRoleName("user");
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setRole(roleService.findByRoleName(role.getName()));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
@@ -51,6 +52,7 @@ public class UserServiceImpl implements UserService {
         Role role = roleService.findByRoleName("admin");
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setRole(roleService.findByRoleName(role.getName()));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
@@ -64,6 +66,10 @@ public class UserServiceImpl implements UserService {
 
         if (request.getUsername() != null && !request.getUsername().isBlank()) {
             user.setUsername(request.getUsername());
+        }
+
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            user.setEmail(request.getEmail());
         }
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {

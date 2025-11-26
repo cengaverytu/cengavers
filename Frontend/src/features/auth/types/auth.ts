@@ -8,6 +8,7 @@ export type SignInInput = z.infer<typeof signInSchema>;
 
 export const signUpSchema = z.object({
     username: z.string().min(3, "Kullanıcı adı en az 3 karakter olmalı"),
+    email: z.string().email("Geçerli bir e-posta adresi giriniz"),
     password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
   });
   
@@ -16,6 +17,7 @@ export const signUpSchema = z.object({
   export type UserDTO = {
     id: number;
     username: string;
+    email: string | null;
     roleId: number;
     createdAt: string;  
   };

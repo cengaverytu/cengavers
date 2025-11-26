@@ -39,10 +39,14 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Username already exists: " + request.getUsername());
         }
 
+        System.out.println("request: " + request);
+        System.out.println("request: " + request.getEmail());
+        System.out.println("request: " + request.getEmail());
         Role role = roleService.findByRoleName(defaultRoleName);
 
         CreateUserRequest createUserReq = new CreateUserRequest();
         createUserReq.setUsername(request.getUsername());
+        createUserReq.setEmail(request.getEmail());
         createUserReq.setPassword(request.getPassword());
         userService.save(createUserReq);
         UserDTO saved = userService.findByUsername(request.getUsername());

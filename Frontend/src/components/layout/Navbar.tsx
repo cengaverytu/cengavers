@@ -2,13 +2,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "../../features/auth/hooks/useAuth";
-import { isAdmin } from "../../features/auth/utils/isAdmin"; // <-- EKLEDİK
+import { isAdmin } from "../../features/auth/utils/isAdmin";
+
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { data: me, isLoading } = useAuthUser();
   const signOut = useSignOut();
   const [open, setOpen] = useState(false);
+
 
   const handleSignOut = () => {
     signOut.mutate(undefined, { onSuccess: () => navigate("/", { replace: true }) });
@@ -43,7 +45,6 @@ export default function Navbar() {
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
-              {/* SADECE ADMIN’E GÖRÜNÜR */}
               {isAdmin(me) && (
                 <button
                   onClick={() => navigate("/admin")}
@@ -54,33 +55,25 @@ export default function Navbar() {
               )}
 
               <button
-                onClick={() => navigate("/dashboard")}
-                className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-              >
-                Dashboard
-              </button>
-
-              <button
                 onClick={handleSignOut}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
-                Sign Out
+                Çıkış Yap
               </button>
             </>
           ) : (
             <>
               <button onClick={() => navigate("/login")} className="hover:underline">
-                Login
+                Giriş Yap
               </button>
               <button onClick={() => navigate("/register")} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-                Sign Up
+                Kayıt Ol
               </button>
             </>
           )}
         </div>
       </nav>
 
-      {/* Mobile menü */}
       <div
         className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-300 ${
           open ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
@@ -91,7 +84,6 @@ export default function Navbar() {
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
-              {/* SADECE ADMIN’E GÖRÜNÜR */}
               {isAdmin(me) && (
                 <button
                   onClick={() => {
@@ -104,15 +96,6 @@ export default function Navbar() {
                 </button>
               )}
 
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/dashboard");
-                }}
-                className="w-full text-left px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-              >
-                Dashboard
-              </button>
 
               <button
                 onClick={() => {
@@ -121,7 +104,7 @@ export default function Navbar() {
                 }}
                 className="w-full text-left px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
-                Sign Out
+                Çıkış Yap
               </button>
             </>
           ) : (
@@ -133,7 +116,7 @@ export default function Navbar() {
                 }}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg"
               >
-                Login
+                Giriş Yap
               </button>
               <button
                 onClick={() => {
@@ -142,7 +125,7 @@ export default function Navbar() {
                 }}
                 className="w-full text-left px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Sign Up
+                Kayıt Ol
               </button>
             </>
           )}

@@ -8,12 +8,12 @@ export default function LoginPage(){
     const navigate = useNavigate();
         const { data: user } = useAuthUser();
     
-        useEffect(() => {
-            if (user) {
-              navigate("/dashboard", { replace: true });
-            }
-          }, [user, navigate]);
-          
+    useEffect(() => {
+        if (user) {
+          navigate("/dashboard", { replace: true });
+        }
+      }, [user, navigate]);
+
           return (
             <div className="flex items-center justify-center min-h-screen">
               <LoginForm />

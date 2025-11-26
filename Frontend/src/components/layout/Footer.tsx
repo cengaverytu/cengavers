@@ -1,17 +1,20 @@
-import { Link } from "react-router-dom";
+import React from 'react';
 
 export default function Footer() {
   return (
-    <footer
-      className="border-t border-border/60 bg-background/70 supports-[backdrop-filter]:backdrop-blur"
-      role="contentinfo"
-    >
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="flex flex-col md:flex-col items-center justify-between gap-4">
-          <div className="text-sm text-center text-muted-foreground">
-            © {new Date().getFullYear()} ClubSender. Tüm hakları saklıdır.
+    <footer className="bg-gray-900 text-white py-8 mt-auto">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="mb-4 md:mb-0">
+            <h3 className="text-lg font-bold">ClubManagement</h3>
+            <p className="text-sm text-gray-400 mt-1">
+              Kulüpleri keşfet, yönet ve sosyalleş.
+            </p>
           </div>
+          <div className="text-sm text-gray-400">
+            &copy; {new Date().getFullYear()} Cengavers. Tüm hakları saklıdır.
           </div>
+        </div>
       </div>
     </footer>
   );
