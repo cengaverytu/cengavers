@@ -20,7 +20,7 @@ export default function Navbar() {
     <header className="border-b">
       <nav className="w-full flex items-center min-h-[72px] px-4 sm:px-6 md:px-10">
         <div className="flex items-center justify-between w-full md:w-auto">
-          <div className="cursor-pointer font-bold text-2xl md:text-3xl" onClick={() => navigate("/")}>
+          <div className="cursor-pointer font-bold text-2xl md:text-3xl" onClick={() => navigate("/dashboard")}>
             ClubManagement
           </div>
 
@@ -45,12 +45,12 @@ export default function Navbar() {
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
-              <button
-                onClick={() => navigate("/announcements")}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
-              >
-                Duyurular
-              </button>
+              {/*<button*/}
+              {/*  onClick={() => navigate("/announcements")}*/}
+              {/*  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"*/}
+              {/*>*/}
+              {/*  Duyurular*/}
+              {/*</button>*/}
 
               {isAdmin(me) && (
                 <button

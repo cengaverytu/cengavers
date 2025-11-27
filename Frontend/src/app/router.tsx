@@ -10,44 +10,48 @@ import AdminUsersPage from "./routes/AdminUsersPage";
 import Layout from "../components/layout/Layout";
 import MessagePage from "./routes/MessagePage";
 import AnnouncementsPage from "./routes/AnnouncementsPage";
-import UserAnnouncementsPage from "./routes/UserAnnouncementsPage";               
+import UserAnnouncementsPage from "./routes/UserAnnouncementsPage";
 
 export default function Router() {
-  return (
-    <BrowserRouter>
-      <Routes>
-      <Route index element={<HomePage />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route element={<Layout />}>
+                    {/* Home artık Layout içinde -> Navbar/Footer görünür */}
+                    <Route index element={<HomePage />} />
 
-        <Route element={<Layout />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/announcements"
-            element={
-              <ProtectedRoute>
-                <UserAnnouncementsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/messages" element={<MessagePage />} />
-            <Route path="/admin/announcements" element={<AnnouncementsPage />} />
-          </Route>
-        </Route>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
 
-        {/* fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/announcements"
+                        element={
+                            <ProtectedRoute>
+                                <UserAnnouncementsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route element={<AdminRoute />}>
+                        <Route path="/admin" element={<AdminPanel />} />
+                        <Route path="/admin/users" element={<AdminUsersPage />} />
+                        <Route path="/messages" element={<MessagePage />} />
+                        <Route path="/admin/announcements" element={<AnnouncementsPage />} />
+                    </Route>
+                </Route>
+
+                {/* fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }

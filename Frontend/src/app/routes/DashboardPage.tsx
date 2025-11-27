@@ -1,10 +1,10 @@
+import UserAnnouncementsPage from "./UserAnnouncementsPage.tsx";
+
 export default function DashboardPage(){
     return(
     <>
     
-    <section className="min-h-screen max-w-7xl mx-auto flex flex-col items-center justify-center">
-        Dashboard page
-    </section>
+      <UserAnnouncementsPage/>
     </>
     )
 }
