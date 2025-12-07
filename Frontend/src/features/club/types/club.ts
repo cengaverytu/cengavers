@@ -15,6 +15,13 @@ export const createClubSchema = z.object({
 
 export type CreateClubInput = z.infer<typeof createClubSchema>;
 
+
+export interface CreateClubRoleRequest {
+    name: string;
+    clubId: number;
+    isAdmin: boolean;
+}
+
 export interface ClubResponse {
     id: number;
     name: string;
@@ -33,4 +40,10 @@ export interface ClubMemberResponse {
     status: MembershipStatus;
     roleName: string;
     joinDate: string;
+}
+
+export interface ClubRoleResponse {
+    id: number;
+    name: string;
+    clubId: number;
 }
