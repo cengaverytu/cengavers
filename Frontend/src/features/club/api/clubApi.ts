@@ -32,6 +32,14 @@ export async function joinClub(id: number): Promise<void> {
     await http.post<void>(`/club/${id}/join`);
 }
 
+export async function approveMembership(id: number): Promise<void> {
+    await http.post<void>(`/club/member/${id}/approve`);
+}
+
+export async function rejectMembership(id: number): Promise<void> {
+    await http.post<void>(`/club/member/${id}/reject`);
+}
+
 export async function leaveClub(id: number): Promise<void> {
     await http.delete<void>(`/club/${id}/leave`);
 }

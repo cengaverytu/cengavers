@@ -16,6 +16,8 @@ public interface ClubService {
     List<ClubResponse> getJoinedClubs();
 
     void joinClub(Long clubId);
+    void approveMembership(Long memberId);
+    void rejectMembership(Long memberId);
     void leaveClub(Long clubId);
 }
 

@@ -127,6 +127,31 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
+    @Transactional
+    public void approveMembership(Long memberId) {
+        ClubMember memberRequest = clubMemberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member request not found"));
+        
+        User currentUser = getCurrentUserEntity();
+        checkClubAdminAccess(memberRequest.getClub(), currentUser);
+        
+        memberRequest.setStatus(MembershipStatus.APPROVED);
+        clubMemberRepository.save(memberRequest);
+    }
+
+    @Override
+    public void rejectMembership(Long memberId) {
+         ClubMember memberRequest = clubMemberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member request not found"));
+        
+        User currentUser = getCurrentUserEntity();
+        checkClubAdminAccess(memberRequest.getClub(), currentUser);
+
+        memberRequest.setStatus(MembershipStatus.REJECTED);
+        clubMemberRepository.save(memberRequest);
+    }
+
+    @Override
     public void leaveClub(Long clubId) {
         User currentUser = getCurrentUserEntity();
         ClubMember member = clubMemberRepository.findByClubIdAndUserId(clubId, currentUser.getId())

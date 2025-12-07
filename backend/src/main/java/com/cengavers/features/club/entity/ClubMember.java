@@ -26,6 +26,10 @@ public class ClubMember {
     @Enumerated(EnumType.STRING)
     private MembershipStatus status;
 
+    @ManyToOne
+    @JoinColumn(name = "club_role_id")
+    private ClubRole role;
+
     private LocalDateTime joinDate = LocalDateTime.now();
 }
 

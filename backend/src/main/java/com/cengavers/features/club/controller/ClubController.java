@@ -53,6 +53,18 @@ public class ClubController {
         clubService.joinClub(id);
         return ResponseEntity.ok().build();
     }
+    
+    @PostMapping("/member/{id}/approve")
+    public ResponseEntity<Void> approveMembership(@PathVariable Long id) {
+        clubService.approveMembership(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/member/{id}/reject")
+    public ResponseEntity<Void> rejectMembership(@PathVariable Long id) {
+        clubService.rejectMembership(id);
+        return ResponseEntity.ok().build();
+    }
 
     @DeleteMapping("/{id}/leave")
     public ResponseEntity<Void> leaveClub(@PathVariable Long id) {

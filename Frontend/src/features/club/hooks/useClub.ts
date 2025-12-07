@@ -6,7 +6,9 @@ import {
     joinClub, 
     leaveClub,
     approveClub,
-    rejectClub
+    rejectClub,
+    approveMembership,
+    rejectMembership
 } from "../api/clubApi";
 import { CreateClubRequest } from "../types/club";
 
@@ -59,6 +61,27 @@ export function useLeaveClub() {
         },
     });
 }
+
+export function useApproveMembership() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => approveMembership(id),
+        onSuccess: () => {
+             qc.invalidateQueries({ queryKey: ["clubs"] }); 
+        },
+    });
+}
+
+export function useRejectMembership() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => rejectMembership(id),
+        onSuccess: () => {
+             qc.invalidateQueries({ queryKey: ["clubs"] });
+        },
+    });
+}
+
 
 export function useApproveClub() {
     const qc = useQueryClient();
