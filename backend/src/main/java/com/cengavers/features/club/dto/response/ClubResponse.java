@@ -16,6 +16,7 @@ public class ClubResponse {
     private ClubStatus status;
     private String ownerUsername;
     private LocalDateTime createdAt;
+    private MembershipStatus currentUserStatus;
     private long memberCount;
 }
 

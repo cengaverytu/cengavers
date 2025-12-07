@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export type ClubStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type MembershipStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface CreateClubRequest {
     name: string;
@@ -21,4 +22,15 @@ export interface ClubResponse {
     status: ClubStatus;
     ownerUsername: string;
     createdAt: string;
+    currentUserStatus?: MembershipStatus;
+    memberCount: number;
+}
+
+export interface ClubMemberResponse {
+    id: number;
+    userId: number;
+    username: string;
+    status: MembershipStatus;
+    roleName: string;
+    joinDate: string;
 }

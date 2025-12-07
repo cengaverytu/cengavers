@@ -24,5 +24,28 @@ public class ClubController {
     public ResponseEntity<ClubResponse> createClub(@RequestBody CreateClubRequest request) {
         return ResponseEntity.ok(clubService.createClub(request));
     }
+
+    @GetMapping
+    public ResponseEntity<List<ClubResponse>> getAllClubs() {
+        return ResponseEntity.ok(clubService.getAllClubs());
+    }
+
+    @GetMapping("/my-joined")
+    public ResponseEntity<List<ClubResponse>> getJoinedClubs() {
+        return ResponseEntity.ok(clubService.getJoinedClubs());
+    }
+
+    @PostMapping("/{id}/join")
+    public ResponseEntity<Void> joinClub(@PathVariable Long id) {
+        clubService.joinClub(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/leave")
+    public ResponseEntity<Void> leaveClub(@PathVariable Long id) {
+        clubService.leaveClub(id);
+        return ResponseEntity.ok().build();
+    }
+
 }
 

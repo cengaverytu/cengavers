@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { useCreateClub } from "../../features/club/hooks/useClub";
+import { useClubs, useJoinedClubs, useCreateClub } from "../../features/club/hooks/useClub";
+import ClubList from "../../features/club/components/ClubList";
 import Modal from "../../components/ui/Modal";
 import CreateClubForm from "../../features/club/components/CreateClubForm";
 import { CreateClubInput } from "../../features/club/types/club";
 
 export default function ClubPage() {
+    const { data: allClubs, isLoading: loadingAll } = useClubs();
+    const { data: joinedClubs, isLoading: loadingJoined } = useJoinedClubs();
     const { mutateAsync: createClub } = useCreateClub();
 
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
@@ -18,6 +21,11 @@ export default function ClubPage() {
         }
     };
 
+    if (loadingAll || loadingJoined) {
+        return <div className="flex justify-center p-8">Yükleniyor...</div>;
+    }
+
+    const approvedClubs = allClubs?.filter(c => c.status === 'APPROVED') || [];
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -30,6 +38,18 @@ export default function ClubPage() {
                     Yeni Kulüp Oluştur
                 </button>
             </div>
+
+            <ClubList 
+                title="Üye Olduğum Kulüpler" 
+                clubs={joinedClubs || []} 
+                showLeaveButton 
+            />
+
+            <ClubList 
+                title="Tüm Kulüpler" 
+                clubs={approvedClubs} 
+                showJoinButton 
+            />
 
             <Modal
                 open={isCreateModalOpen}
