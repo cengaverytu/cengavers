@@ -12,6 +12,7 @@ import MessagePage from "./routes/MessagePage";
 import AnnouncementsPage from "./routes/AnnouncementsPage";
 import UserAnnouncementsPage from "./routes/UserAnnouncementsPage";
 import ClubPage from "./routes/ClubPage";
+import AdminClubsPage from "./routes/AdminClubsPage";
 
 export default function Router() {
     return (
@@ -52,6 +53,7 @@ export default function Router() {
                     <Route element={<AdminRoute />}>
                         <Route path="/admin" element={<AdminPanel />} />
                         <Route path="/admin/users" element={<AdminUsersPage />} />
+                        <Route path="/admin/clubs" element={<AdminClubsPage />} />
                         <Route path="/messages" element={<MessagePage />} />
                         <Route path="/admin/announcements" element={<AnnouncementsPage />} />
                     </Route>

@@ -49,6 +49,30 @@ public class ClubServiceImpl implements ClubService {
         Club saved = clubRepository.save(club);
         return mapToClubResponse(saved);
     }
+    
+    @Override
+    @Transactional
+    public ClubResponse approveClub(Long clubId) {
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+        club.setStatus(ClubStatus.APPROVED);
+        
+        ClubMember member = new ClubMember();
+        member.setClub(club);
+        member.setUser(club.getOwner());
+        member.setStatus(MembershipStatus.APPROVED);
+        clubMemberRepository.save(member);
+        
+        return mapToClubResponse(clubRepository.save(club));
+    }
+
+    @Override
+    public void rejectClub(Long clubId) {
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+        club.setStatus(ClubStatus.REJECTED);
+        clubRepository.save(club);
+    }
 
     @Override
     public List<ClubResponse> getAllClubs() {

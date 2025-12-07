@@ -25,6 +25,19 @@ public class ClubController {
         return ResponseEntity.ok(clubService.createClub(request));
     }
 
+    @PutMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ClubResponse> approveClub(@PathVariable Long id) {
+        return ResponseEntity.ok(clubService.approveClub(id));
+    }
+
+    @PutMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> rejectClub(@PathVariable Long id) {
+        clubService.rejectClub(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<ClubResponse>> getAllClubs() {
         return ResponseEntity.ok(clubService.getAllClubs());

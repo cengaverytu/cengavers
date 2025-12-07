@@ -1,5 +1,5 @@
 import { ClubResponse } from "../types/club";
-import { useJoinClub, useLeaveClub} from "../hooks/useClub";
+import { useJoinClub, useLeaveClub, useApproveClub, useRejectClub } from "../hooks/useClub";
 import { useAuthUser } from "../../auth/hooks/useAuth";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
 export default function ClubList({ clubs, title, showJoinButton, showLeaveButton, showStatus, showAdminActions }: Props) {
     const { mutate: joinClub, isPending: isJoining } = useJoinClub();
     const { mutate: leaveClub, isPending: isLeaving } = useLeaveClub();
+    const { mutate: approveClub, isPending: isApproving } = useApproveClub();
+    const { mutate: rejectClub, isPending: isRejecting } = useRejectClub();
     
     const { data: user } = useAuthUser();
 
@@ -51,6 +53,24 @@ export default function ClubList({ clubs, title, showJoinButton, showLeaveButton
                         </div>
                         
                         <div className="flex justify-end space-x-2">
+                            {showAdminActions && user?.role === 'ADMIN' && club.status === 'PENDING' && (
+                                <>
+                                    <button
+                                        onClick={() => approveClub(club.id)}
+                                        disabled={isApproving}
+                                        className="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                                    >
+                                        Onayla
+                                    </button>
+                                    <button
+                                        onClick={() => rejectClub(club.id)}
+                                        disabled={isRejecting}
+                                        className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                                    >
+                                        Reddet
+                                    </button>
+                                </>
+                            )}
 
                             {showJoinButton 
                                 && user?.username !== club.ownerUsername 
