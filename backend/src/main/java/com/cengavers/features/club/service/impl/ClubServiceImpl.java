@@ -49,5 +49,77 @@ public class ClubServiceImpl implements ClubService {
         Club saved = clubRepository.save(club);
         return mapToClubResponse(saved);
     }
+
+    @Override
+    public List<ClubResponse> getAllClubs() {
+        User currentUser = getCurrentUserEntity();
+        
+        // Get all memberships of the current user
+        java.util.Map<Long, MembershipStatus> membershipMap = clubMemberRepository.findByUserId(currentUser.getId()).stream()
+                .collect(Collectors.toMap(m -> m.getClub().getId(), ClubMember::getStatus));
+
+        return clubRepository.findAll().stream()
+                .map(club -> {
+                    ClubResponse response = mapToClubResponse(club);
+                    response.setCurrentUserStatus(membershipMap.get(club.getId()));
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClubResponse> getJoinedClubs() {
+        User currentUser = getCurrentUserEntity();
+        return clubMemberRepository.findByUserId(currentUser.getId()).stream()
+                .filter(m -> m.getStatus() == MembershipStatus.APPROVED)
+                .map(m -> {
+                     ClubResponse response = mapToClubResponse(m.getClub());
+                     response.setCurrentUserStatus(MembershipStatus.APPROVED);
+                     return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void joinClub(Long clubId) {
+        User currentUser = getCurrentUserEntity();
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+        
+        if (club.getStatus() != ClubStatus.APPROVED) {
+             throw new RuntimeException("Cannot join a club that is not approved");
+        }
+
+        if (clubMemberRepository.findByClubIdAndUserId(clubId, currentUser.getId()).isPresent()) {
+            throw new RuntimeException("Already a member or requested");
+        }
+
+        ClubMember member = new ClubMember();
+        member.setClub(club);
+        member.setUser(currentUser);
+        member.setStatus(MembershipStatus.PENDING);
+        clubMemberRepository.save(member);
+    }
+
+    @Override
+    public void leaveClub(Long clubId) {
+        User currentUser = getCurrentUserEntity();
+        ClubMember member = clubMemberRepository.findByClubIdAndUserId(clubId, currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Not a member"));
+        clubMemberRepository.delete(member);
+    }
+
+    private ClubResponse mapToClubResponse(Club club) {
+        return ClubResponse.builder()
+                .id(club.getId())
+                .name(club.getName())
+                .description(club.getDescription())
+                .status(club.getStatus())
+                .ownerUsername(club.getOwner().getUsername())
+                .createdAt(club.getCreatedAt())
+                .memberCount(clubMemberRepository.findByClubIdAndStatus(club.getId(), MembershipStatus.APPROVED).size())
+                .build();
+    }
 }
 

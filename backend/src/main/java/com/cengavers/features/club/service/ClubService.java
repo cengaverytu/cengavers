@@ -10,5 +10,10 @@ import java.util.List;
 
 public interface ClubService {
     ClubResponse createClub(CreateClubRequest request);
+    List<ClubResponse> getAllClubs();
+    List<ClubResponse> getJoinedClubs();
+
+    void joinClub(Long clubId);
+    void leaveClub(Long clubId);
 }
 
