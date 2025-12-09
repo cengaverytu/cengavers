@@ -43,6 +43,11 @@ public class ClubController {
         return ResponseEntity.ok(clubService.getAllClubs());
     }
 
+    @GetMapping("/my-managed")
+    public ResponseEntity<List<ClubResponse>> getManagedClubs() {
+        return ResponseEntity.ok(clubService.getManagedClubs());
+    }
+
     @GetMapping("/my-joined")
     public ResponseEntity<List<ClubResponse>> getJoinedClubs() {
         return ResponseEntity.ok(clubService.getJoinedClubs());
@@ -53,7 +58,7 @@ public class ClubController {
         clubService.joinClub(id);
         return ResponseEntity.ok().build();
     }
-    
+
     @PostMapping("/member/{id}/approve")
     public ResponseEntity<Void> approveMembership(@PathVariable Long id) {
         clubService.approveMembership(id);
@@ -72,5 +77,25 @@ public class ClubController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/members")
+    public ResponseEntity<List<ClubMemberResponse>> getClubMembers(@PathVariable Long id) {
+        return ResponseEntity.ok(clubService.getClubMembers(id));
+    }
+
+    @PostMapping("/role")
+    public ResponseEntity<ClubRoleResponse> createClubRole(@RequestBody CreateClubRoleRequest request) {
+        return ResponseEntity.ok(clubService.createClubRole(request));
+    }
+
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<List<ClubRoleResponse>> getClubRoles(@PathVariable Long id) {
+        return ResponseEntity.ok(clubService.getClubRoles(id));
+    }
+
+    @PostMapping("/member/{memberId}/assign-role/{roleId}")
+    public ResponseEntity<Void> assignRole(@PathVariable Long memberId, @PathVariable Long roleId) {
+        clubService.assignRole(memberId, roleId);
+        return ResponseEntity.ok().build();
+    }
 }
 

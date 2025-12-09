@@ -1,7 +1,10 @@
 import { http } from "../../../lib/http";
 import { 
     ClubResponse, 
-    CreateClubRequest
+    CreateClubRequest, 
+    ClubMemberResponse, 
+    CreateClubRoleRequest, 
+    ClubRoleResponse 
 } from "../types/club";
 
 export async function createClub(data: CreateClubRequest): Promise<ClubResponse> {
@@ -20,6 +23,11 @@ export async function rejectClub(id: number): Promise<void> {
 
 export async function getAllClubs(): Promise<ClubResponse[]> {
     const res = await http.get<ClubResponse[]>("/club");
+    return res.data;
+}
+
+export async function getManagedClubs(): Promise<ClubResponse[]> {
+    const res = await http.get<ClubResponse[]>("/club/my-managed");
     return res.data;
 }
 
@@ -42,4 +50,23 @@ export async function rejectMembership(id: number): Promise<void> {
 
 export async function leaveClub(id: number): Promise<void> {
     await http.delete<void>(`/club/${id}/leave`);
+}
+
+export async function getClubMembers(id: number): Promise<ClubMemberResponse[]> {
+    const res = await http.get<ClubMemberResponse[]>(`/club/${id}/members`);
+    return res.data;
+}
+
+export async function getClubRoles(id: number): Promise<ClubRoleResponse[]> {
+    const res = await http.get<ClubRoleResponse[]>(`/club/${id}/roles`);
+    return res.data;
+}
+
+export async function createClubRole(data: CreateClubRoleRequest): Promise<ClubRoleResponse> {
+    const res = await http.post<ClubRoleResponse>("/club/role", data);
+    return res.data;
+}
+
+export async function assignRole(memberId: number, roleId: number): Promise<void> {
+    await http.post<void>(`/club/member/${memberId}/assign-role/${roleId}`);
 }

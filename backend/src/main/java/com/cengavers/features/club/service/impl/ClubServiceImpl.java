@@ -49,7 +49,7 @@ public class ClubServiceImpl implements ClubService {
         Club saved = clubRepository.save(club);
         return mapToClubResponse(saved);
     }
-    
+
     @Override
     @Transactional
     public ClubResponse approveClub(Long clubId) {
@@ -83,6 +83,33 @@ public class ClubServiceImpl implements ClubService {
                 .collect(Collectors.toMap(m -> m.getClub().getId(), ClubMember::getStatus));
 
         return clubRepository.findAll().stream()
+                .map(club -> {
+                    ClubResponse response = mapToClubResponse(club);
+                    response.setCurrentUserStatus(membershipMap.get(club.getId()));
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<ClubResponse> getManagedClubs() {
+        User currentUser = getCurrentUserEntity();
+        
+        // Get all memberships for role checking
+        List<ClubMember> myMemberships = clubMemberRepository.findByUserId(currentUser.getId());
+        
+        List<Long> managedClubIds = myMemberships.stream()
+                .filter(m -> m.getStatus() == MembershipStatus.APPROVED && m.getRole() != null && m.getRole().isAdmin())
+                .map(m -> m.getClub().getId())
+                .collect(Collectors.toList());
+
+        // Map for status
+        java.util.Map<Long, MembershipStatus> membershipMap = myMemberships.stream()
+                .collect(Collectors.toMap(m -> m.getClub().getId(), ClubMember::getStatus));
+
+        return clubRepository.findAll().stream()
+                .filter(c -> c.getOwner().getId().equals(currentUser.getId()) || managedClubIds.contains(c.getId()))
                 .map(club -> {
                     ClubResponse response = mapToClubResponse(club);
                     response.setCurrentUserStatus(membershipMap.get(club.getId()));
@@ -151,12 +178,75 @@ public class ClubServiceImpl implements ClubService {
         clubMemberRepository.save(memberRequest);
     }
 
+    private void checkClubAdminAccess(Club club, User user) {
+        if (club.getOwner().getId().equals(user.getId())) return;
+
+        boolean isAdmin = clubMemberRepository.findByClubIdAndUserId(club.getId(), user.getId())
+                .map(m -> m.getStatus() == MembershipStatus.APPROVED && m.getRole() != null && m.getRole().isAdmin())
+                .orElse(false);
+
+        if (!isAdmin) {
+            throw new RuntimeException("Only club owner or admins can perform this action");
+        }
+    }
+
     @Override
     public void leaveClub(Long clubId) {
         User currentUser = getCurrentUserEntity();
         ClubMember member = clubMemberRepository.findByClubIdAndUserId(clubId, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Not a member"));
         clubMemberRepository.delete(member);
+    }
+
+    @Override
+    public List<ClubMemberResponse> getClubMembers(Long clubId) {
+        return clubMemberRepository.findByClubId(clubId).stream()
+                .map(this::mapToMemberResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ClubRoleResponse createClubRole(CreateClubRoleRequest request) {
+        Club club = clubRepository.findById(request.getClubId())
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+        
+        User currentUser = getCurrentUserEntity();
+        if (!club.getOwner().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only club owner can create roles");
+        }
+
+        ClubRole role = new ClubRole();
+        role.setName(request.getName());
+        role.setClub(club);
+        role.setAdmin(request.isAdmin());
+        return mapToRoleResponse(clubRoleRepository.save(role));
+    }
+
+    @Override
+    public List<ClubRoleResponse> getClubRoles(Long clubId) {
+        return clubRoleRepository.findByClubId(clubId).stream()
+                .map(this::mapToRoleResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void assignRole(Long memberId, Long roleId) {
+        ClubMember member = clubMemberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+        
+        User currentUser = getCurrentUserEntity();
+        checkClubAdminAccess(member.getClub(), currentUser);
+
+        ClubRole role = clubRoleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        
+        if (!role.getClub().getId().equals(member.getClub().getId())) {
+             throw new RuntimeException("Role does not belong to this club");
+        }
+
+        member.setRole(role);
+        clubMemberRepository.save(member);
     }
 
     private ClubResponse mapToClubResponse(Club club) {
@@ -168,6 +258,25 @@ public class ClubServiceImpl implements ClubService {
                 .ownerUsername(club.getOwner().getUsername())
                 .createdAt(club.getCreatedAt())
                 .memberCount(clubMemberRepository.findByClubIdAndStatus(club.getId(), MembershipStatus.APPROVED).size())
+                .build();
+    }
+
+    private ClubMemberResponse mapToMemberResponse(ClubMember member) {
+        return ClubMemberResponse.builder()
+                .id(member.getId())
+                .userId(member.getUser().getId())
+                .username(member.getUser().getUsername())
+                .status(member.getStatus())
+                .roleName(member.getRole() != null ? member.getRole().getName() : null)
+                .joinDate(member.getJoinDate())
+                .build();
+    }
+
+    private ClubRoleResponse mapToRoleResponse(ClubRole role) {
+        return ClubRoleResponse.builder()
+                .id(role.getId())
+                .name(role.getName())
+                .clubId(role.getClub().getId())
                 .build();
     }
 }

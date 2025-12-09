@@ -19,6 +19,8 @@ export default function ClubList({ clubs, title, showJoinButton, showLeaveButton
     
     const { data: user } = useAuthUser();
 
+    console.log(user);
+
     if (!clubs || clubs.length === 0) {
         return (
             <div className="mb-8">
@@ -53,7 +55,8 @@ export default function ClubList({ clubs, title, showJoinButton, showLeaveButton
                         </div>
                         
                         <div className="flex justify-end space-x-2">
-                            {showAdminActions && user?.role === 'ADMIN' && club.status === 'PENDING' && (
+                            
+                            {showAdminActions && user?.roleId === 1 && club.status === 'PENDING' && (
                                 <>
                                     <button
                                         onClick={() => approveClub(club.id)}

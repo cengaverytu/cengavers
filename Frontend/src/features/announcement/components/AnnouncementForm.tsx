@@ -19,7 +19,7 @@ type UpdateProps = {
 type Props = CreateProps | UpdateProps;
 
 export default function AnnouncementForm(props: Props) {
-    const { defaultValues, onSubmit, submitLabel = "Kaydet", mode } = props;
+    const { defaultValues, submitLabel = "Kaydet", mode } = props;
 
     const {
         register,
@@ -30,10 +30,15 @@ export default function AnnouncementForm(props: Props) {
         defaultValues,
     });
 
+    const handleFormSubmit = (data: CreateAnnouncementInput | UpdateAnnouncementInput) => {
+        props.onSubmit(data as any);
+    };
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <div>
                 <label className="block text-sm font-medium text-gray-700">
+                    
                     Başlık {mode === "create" && <span className="text-red-500">*</span>}
                 </label>
                 <input

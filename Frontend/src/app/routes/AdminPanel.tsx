@@ -15,6 +15,14 @@ export default function AdminPanel() {
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Messages</h2>
                     <p className="text-gray-500 text-center">Manage system messages</p>
                 </div>
+                
+                <div 
+                    onClick={() => navigate(`/admin/clubs`)}
+                    className="bg-white p-6 rounded-lg shadow border border-gray-200 hover:shadow-md transition cursor-pointer group flex flex-col items-center justify-center h-48"
+                >
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Kulüp Yönetimi</h2>
+                    <p className="text-gray-500 text-center">Approve or reject club requests</p>
+                </div>
 
                 <div 
                     onClick={() => navigate(`/admin/users`)}
@@ -23,7 +31,6 @@ export default function AdminPanel() {
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Kullanıcılar</h2>
                     <p className="text-gray-500 text-center">View and manage users</p>
                 </div>
-
                 <div 
                     onClick={() => navigate(`/admin/announcements`)}
                     className="bg-white p-6 rounded-lg shadow border border-gray-200 hover:shadow-md transition cursor-pointer group flex flex-col items-center justify-center h-48"
