@@ -36,7 +36,10 @@ public class SecurityConfig {
     private String cookieName;
 
     private static final List<String> ALLOWED_ORIGINS = List.of(
-            "http://localhost:*","/v3/api-docs/**", "/swagger-ui/**"
+            "http://localhost:*",
+            "https://cevik.melihyelman.com",
+            "/v3/api-docs/**", 
+            "/swagger-ui/**"
     );
 
     @Bean
