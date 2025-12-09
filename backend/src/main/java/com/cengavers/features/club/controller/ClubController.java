@@ -43,6 +43,11 @@ public class ClubController {
         return ResponseEntity.ok(clubService.getAllClubs());
     }
 
+    @GetMapping("/public")
+    public ResponseEntity<List<ClubResponse>> getPublicClubs() {
+        return ResponseEntity.ok(clubService.getPublicClubs());
+    }
+
     @GetMapping("/my-managed")
     public ResponseEntity<List<ClubResponse>> getManagedClubs() {
         return ResponseEntity.ok(clubService.getManagedClubs());

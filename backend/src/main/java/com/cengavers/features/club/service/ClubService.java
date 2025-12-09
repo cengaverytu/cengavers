@@ -13,6 +13,7 @@ public interface ClubService {
     ClubResponse approveClub(Long clubId);
     void rejectClub(Long clubId);
     List<ClubResponse> getAllClubs();
+    List<ClubResponse> getPublicClubs();
     List<ClubResponse> getManagedClubs();
     List<ClubResponse> getJoinedClubs();
 

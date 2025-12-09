@@ -13,7 +13,8 @@ import {
     getClubRoles,
     createClubRole,
     assignRole,
-    getManagedClubs
+    getManagedClubs,
+    getPublicClubs
 } from "../api/clubApi";
 import { CreateClubRequest, CreateClubRoleRequest } from "../types/club";
 
@@ -31,6 +32,13 @@ export function useClubs() {
     return useQuery({
         queryKey: CLUB_KEYS.all,
         queryFn: getAllClubs,
+    });
+}
+
+export function usePublicClubs() {
+    return useQuery({
+        queryKey: CLUB_KEYS.public,
+        queryFn: getPublicClubs,
     });
 }
 
