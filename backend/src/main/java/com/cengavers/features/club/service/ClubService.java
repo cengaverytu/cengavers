@@ -13,11 +13,18 @@ public interface ClubService {
     ClubResponse approveClub(Long clubId);
     void rejectClub(Long clubId);
     List<ClubResponse> getAllClubs();
+    List<ClubResponse> getManagedClubs();
     List<ClubResponse> getJoinedClubs();
 
     void joinClub(Long clubId);
     void approveMembership(Long memberId);
     void rejectMembership(Long memberId);
     void leaveClub(Long clubId);
+
+    List<ClubMemberResponse> getClubMembers(Long clubId);
+
+    ClubRoleResponse createClubRole(CreateClubRoleRequest request);
+    List<ClubRoleResponse> getClubRoles(Long clubId);
+    void assignRole(Long memberId, Long roleId);
 }
 
