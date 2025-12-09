@@ -91,6 +91,24 @@ public class ClubServiceImpl implements ClubService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ClubResponse> getPublicClubs() {
+        return clubRepository.findAll().stream()
+                .filter(c -> c.getStatus() == ClubStatus.APPROVED)
+                .map(club -> {
+                    return ClubResponse.builder()
+                            .id(club.getId())
+                            .name(club.getName())
+                            .description(club.getDescription())
+                            .status(club.getStatus())
+                            .ownerUsername(club.getOwner().getUsername())
+                            .createdAt(club.getCreatedAt())
+                            .memberCount(clubMemberRepository.findByClubIdAndStatus(club.getId(), MembershipStatus.APPROVED).size())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public List<ClubResponse> getManagedClubs() {

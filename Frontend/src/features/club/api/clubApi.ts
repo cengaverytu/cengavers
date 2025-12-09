@@ -26,6 +26,11 @@ export async function getAllClubs(): Promise<ClubResponse[]> {
     return res.data;
 }
 
+export async function getPublicClubs(): Promise<ClubResponse[]> {
+    const res = await http.get<ClubResponse[]>("/club/public");
+    return res.data;
+}
+
 export async function getManagedClubs(): Promise<ClubResponse[]> {
     const res = await http.get<ClubResponse[]>("/club/my-managed");
     return res.data;
