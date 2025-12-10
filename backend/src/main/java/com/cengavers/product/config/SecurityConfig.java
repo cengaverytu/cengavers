@@ -36,7 +36,10 @@ public class SecurityConfig {
     private String cookieName;
 
     private static final List<String> ALLOWED_ORIGINS = List.of(
-            "http://localhost:*","/v3/api-docs/**", "/swagger-ui/**"
+            "http://localhost:*",
+            "https://cevik.melihyelman.com",
+            "/v3/api-docs/**", 
+            "/swagger-ui/**"
     );
 
     @Bean
@@ -56,7 +59,9 @@ public class SecurityConfig {
         conf.setAllowedOriginPatterns(ALLOWED_ORIGINS);
         conf.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         conf.setAllowedHeaders(List.of("*"));
+        conf.setExposedHeaders(List.of("Set-Cookie", "Authorization"));
         conf.setAllowCredentials(true);
+        conf.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", conf);
         return source;
@@ -80,6 +85,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/messages/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/announcements/active").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/club/public").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/docs/**").permitAll()
                         .requestMatchers(

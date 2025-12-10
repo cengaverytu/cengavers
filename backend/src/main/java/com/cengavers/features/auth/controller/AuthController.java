@@ -46,7 +46,7 @@ public class AuthController {
                 .secure(cookieSecure)
                 .path("/")
                 .maxAge(Duration.ofMillis(signInDTO.getExpiresIn()))
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         resp.addHeader(HttpHeaders.SET_COOKIE,cookie.toString());
         return ResponseEntity.ok(signInDTO);
@@ -59,7 +59,7 @@ public class AuthController {
                 .secure(cookieSecure)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         res.addHeader(HttpHeaders.SET_COOKIE, cleared.toString());
         return ResponseEntity.ok().build();
