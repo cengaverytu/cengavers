@@ -57,10 +57,19 @@ public class ClubServiceImpl implements ClubService {
                 .orElseThrow(() -> new RuntimeException("Club not found"));
         club.setStatus(ClubStatus.APPROVED);
         
+        // Create default admin role for the club
+        ClubRole adminRole = new ClubRole();
+        adminRole.setName("Kurucu");
+        adminRole.setAdmin(true);
+        adminRole.setClub(club);
+        clubRoleRepository.save(adminRole);
+        
+        // Assign owner as admin member
         ClubMember member = new ClubMember();
         member.setClub(club);
         member.setUser(club.getOwner());
         member.setStatus(MembershipStatus.APPROVED);
+        member.setRole(adminRole);
         clubMemberRepository.save(member);
         
         return mapToClubResponse(clubRepository.save(club));
@@ -225,6 +234,9 @@ public class ClubServiceImpl implements ClubService {
 
     @Override
     public ClubRoleResponse createClubRole(CreateClubRoleRequest request) {
+        System.out.println("=== Creating Club Role ===");
+        System.out.println("Request: name=" + request.getName() + ", clubId=" + request.getClubId() + ", isAdmin=" + request.isAdmin());
+        
         Club club = clubRepository.findById(request.getClubId())
                 .orElseThrow(() -> new RuntimeException("Club not found"));
         
@@ -237,7 +249,11 @@ public class ClubServiceImpl implements ClubService {
         role.setName(request.getName());
         role.setClub(club);
         role.setAdmin(request.isAdmin());
-        return mapToRoleResponse(clubRoleRepository.save(role));
+        
+        ClubRole saved = clubRoleRepository.save(role);
+        System.out.println("Saved role: id=" + saved.getId() + ", isAdmin=" + saved.isAdmin());
+        
+        return mapToRoleResponse(saved);
     }
 
     @Override

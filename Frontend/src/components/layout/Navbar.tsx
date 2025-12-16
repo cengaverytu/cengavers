@@ -53,9 +53,9 @@ export default function Navbar() {
             <>
               {hasClubAccess && (
                 <button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/club-management")}
                   className={`px-4 py-2 rounded-lg transition ${
-                    isActive("/dashboard") 
+                    isActive("/club-management") 
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 hover:bg-gray-200"
                   }`}
@@ -72,6 +72,16 @@ export default function Navbar() {
                 }`}
               >
                 Kulüpler
+              </button>
+              <button
+                onClick={() => navigate("/events")}
+                className={`px-4 py-2 rounded-lg transition ${
+                  isActive("/events")
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+              >
+                Etkinlikler
               </button>
               <button
                 onClick={() => navigate("/announcements")}
@@ -145,10 +155,10 @@ export default function Navbar() {
                 <button
                   onClick={() => {
                     setOpen(false);
-                    navigate("/dashboard");
+                    navigate("/club-management");
                   }}
                   className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                    isActive("/dashboard")
+                    isActive("/club-management")
                       ? "bg-blue-600 text-white"
                       : "hover:bg-gray-100"
                   }`}
@@ -169,6 +179,20 @@ export default function Navbar() {
                 }`}
               >
                 Kulüpler
+              </button>
+
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  navigate("/events");
+                }}
+                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                  isActive("/events")
+                    ? "bg-blue-600 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                Etkinlikler
               </button>
 
               <button
