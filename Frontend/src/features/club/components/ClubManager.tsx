@@ -26,6 +26,7 @@ export default function ClubManager({ club }: Props) {
 
     const handleCreateRole = async (data: { name: string; isAdmin: boolean }) => {
         try {
+            console.log("Creating role with data:", { name: data.name, isAdmin: data.isAdmin, clubId: club.id });
             await createRole({ name: data.name, isAdmin: data.isAdmin, clubId: club.id });
             setRoleModalOpen(false);
         } catch (error) {

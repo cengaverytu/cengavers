@@ -13,6 +13,8 @@ import AnnouncementsPage from "./routes/AnnouncementsPage";
 import UserAnnouncementsPage from "./routes/UserAnnouncementsPage";
 import ClubPage from "./routes/ClubPage";
 import AdminClubsPage from "./routes/AdminClubsPage";
+import ClubManagementPage from "./routes/ClubManagementPage";
+import PublicEventsPage from "./routes/PublicEventsPage";
 
 export default function Router() {
     return (
@@ -47,6 +49,22 @@ export default function Router() {
                         element={
                         <ProtectedRoute>
                             <ClubPage />
+                        </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/club-management"
+                        element={
+                        <ProtectedRoute>
+                            <ClubManagementPage />
+                        </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/events"
+                        element={
+                        <ProtectedRoute>
+                            <PublicEventsPage />
                         </ProtectedRoute>
                         }
                     />
