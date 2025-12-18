@@ -24,7 +24,7 @@ export function useSignIn() {
       await qc.invalidateQueries({ queryKey: QK.me });
       const back = sessionStorage.getItem("postLoginRedirect");
       sessionStorage.removeItem("postLoginRedirect");
-      navigate(back || "/dashboard", { replace: true });
+      navigate(back || "/clubs", { replace: true });
     },
   });
 }
@@ -37,7 +37,7 @@ export function useSignUp() {
     onSuccess: async (_data, variables) => {
       await signIn(variables);
       await qc.invalidateQueries({ queryKey: QK.me });
-      navigate("/dashboard", { replace: true });
+      navigate("/clubs", { replace: true });
     },
   });
 }

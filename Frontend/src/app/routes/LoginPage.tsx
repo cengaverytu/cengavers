@@ -10,7 +10,7 @@ export default function LoginPage(){
     
     useEffect(() => {
         if (user) {
-          navigate("/dashboard", { replace: true });
+          navigate("/clubs", { replace: true });
         }
       }, [user, navigate]);
 
