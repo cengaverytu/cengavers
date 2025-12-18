@@ -15,6 +15,7 @@ import ClubPage from "./routes/ClubPage";
 import AdminClubsPage from "./routes/AdminClubsPage";
 import ClubManagementPage from "./routes/ClubManagementPage";
 import PublicEventsPage from "./routes/PublicEventsPage";
+import AdminEventsPage from "./routes/AdminEventsPage";
 
 export default function Router() {
     return (
@@ -28,7 +29,7 @@ export default function Router() {
                     <Route path="/register" element={<RegisterPage />} />
 
                     <Route
-                        path="/dashboard"
+                        path="/clubs"
                         element={
                             <ProtectedRoute>
                                 <DashboardPage />
@@ -72,6 +73,7 @@ export default function Router() {
                         <Route path="/admin" element={<AdminPanel />} />
                         <Route path="/admin/users" element={<AdminUsersPage />} />
                         <Route path="/admin/clubs" element={<AdminClubsPage />} />
+                        <Route path="/admin/events" element={<AdminEventsPage />} />
                         <Route path="/messages" element={<MessagePage />} />
                         <Route path="/admin/announcements" element={<AnnouncementsPage />} />
                     </Route>

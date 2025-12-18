@@ -27,7 +27,7 @@ export default function RegisterForm() {
         username: data.username, 
         password: data.password 
       });
-      navigate("/dashboard", { replace: true });
+      navigate("/clubs", { replace: true });
     } catch (err: any) {
       const apiMsg =
         err?.response?.data?.message ??
