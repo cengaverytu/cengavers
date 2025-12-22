@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useActiveAnnouncements } from "../../features/announcement/hooks/useAnnouncement";
 import { AnnouncementDTO } from "../../features/announcement/types/announcement";
-import AnnouncementCard from "../../features/announcement/components/AnnouncementCard";
+import AnnouncementGridList from "../../features/announcement/components/AnnouncementGridList";
 import AnnouncementDetailModal from "../../features/announcement/components/AnnouncementDetailModal";
 
 export default function UserAnnouncementsPage() {
@@ -17,31 +17,13 @@ export default function UserAnnouncementsPage() {
                 </p>
             </div>
 
-            {isLoading ? (
-                <div className="flex justify-center items-center py-12">
-                    <div className="text-gray-600">Yükleniyor...</div>
-                </div>
-            ) : error ? (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                    Duyurular yüklenirken bir hata oluştu
-                </div>
-            ) : announcements && announcements.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {announcements.map((announcement) => (
-                        <AnnouncementCard
-                            key={announcement.id}
-                            announcement={announcement}
-                            onClick={() => setSelectedAnnouncement(announcement)}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center py-12 bg-white rounded-lg shadow">
-                    <p className="text-gray-500 text-lg">Henüz aktif duyuru bulunmamaktadır.</p>
-                </div>
-            )}
+            <AnnouncementGridList
+                announcements={announcements || []}
+                loading={isLoading}
+                emptyMessage={error ? "Duyurular yüklenirken bir hata oluştu" : "Henüz aktif duyuru bulunmamaktadır."}
+                onClick={(announcement) => setSelectedAnnouncement(announcement)}
+            />
 
-            {/* Duyuru Detay Modal */}
             <AnnouncementDetailModal
                 announcement={selectedAnnouncement}
                 onClose={() => setSelectedAnnouncement(null)}

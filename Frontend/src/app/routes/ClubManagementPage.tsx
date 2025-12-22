@@ -1,24 +1,38 @@
 import { useState } from "react";
 import { useManagedClubs } from "../../features/club/hooks/useClub";
 import { useMyClubEvents, useEvent } from "../../features/event/hooks/useEvent";
+import { useMyAnnouncements, useCreateAnnouncement, useUpdateAnnouncement, useDeleteAnnouncement } from "../../features/announcement/hooks/useAnnouncement";
 import ClubManager from "../../features/club/components/ClubManager";
 import Modal from "../../components/ui/Modal";
 import EventForm from "../../features/event/components/EventForm";
 import EventList from "../../features/event/components/EventList";
 import EventDetailModal from "../../features/event/components/EventDetailModal";
+import AnnouncementForm from "../../features/announcement/components/AnnouncementForm";
+import AnnouncementGridList from "../../features/announcement/components/AnnouncementGridList";
 import { CreateEventInput, EventResponse, UpdateEventInput } from "../../features/event/types/event";
+import { CreateAnnouncementInput, UpdateAnnouncementInput, AnnouncementDTO } from "../../features/announcement/types/announcement";
 
 export default function ClubManagementPage() {
     const { data: managedClubs, isLoading: loadingClubs } = useManagedClubs();
     const { data: myEvents, isLoading: loadingEvents } = useMyClubEvents();
+    const { data: myAnnouncements, isLoading: loadingAnnouncements } = useMyAnnouncements();
     const { createEvent, updateEvent, deleteEvent, isCreating, isUpdating } = useEvent();
+    const { mutateAsync: createAnnouncement, isPending: isCreatingAnnouncement } = useCreateAnnouncement();
+    const { mutateAsync: updateAnnouncement, isPending: isUpdatingAnnouncement } = useUpdateAnnouncement();
+    const { mutateAsync: deleteAnnouncement } = useDeleteAnnouncement();
 
-    const [activeTab, setActiveTab] = useState<"clubs" | "events">("clubs");
+    const [activeTab, setActiveTab] = useState<"clubs" | "events" | "announcements">("clubs");
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isDetailModalOpen, setDetailModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(null);
     const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
+    const [selectedClubName, setSelectedClubName] = useState<string>("");
+    
+    // Announcement states
+    const [isCreateAnnouncementModalOpen, setCreateAnnouncementModalOpen] = useState(false);
+    const [isEditAnnouncementModalOpen, setEditAnnouncementModalOpen] = useState(false);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementDTO | null>(null);
 
     const handleCreateEvent = async (data: CreateEventInput) => {
         try {
@@ -63,9 +77,55 @@ export default function ClubManagementPage() {
         setDetailModalOpen(true);
     };
 
-    const handleCreateClick = (clubId: number) => {
+    const handleCreateClick = (clubId: number, clubName: string) => {
         setSelectedClubId(clubId);
+        setSelectedClubName(clubName);
         setCreateModalOpen(true);
+    };
+
+    const handleCreateAnnouncementClick = (clubId: number, clubName: string) => {
+        setSelectedClubId(clubId);
+        setSelectedClubName(clubName);
+        setCreateAnnouncementModalOpen(true);
+    };
+
+    const handleCreateAnnouncement = async (data: CreateAnnouncementInput) => {
+        try {
+            await createAnnouncement(data);
+            setCreateAnnouncementModalOpen(false);
+            setSelectedClubId(null);
+            setSelectedClubName("");
+        } catch (error) {
+            console.error("Duyuru oluşturulurken hata oluştu:", error);
+            alert("Duyuru oluşturulurken hata oluştu");
+        }
+    };
+
+    const handleUpdateAnnouncement = async (data: UpdateAnnouncementInput) => {
+        if (!selectedAnnouncement) return;
+        try {
+            await updateAnnouncement({ id: selectedAnnouncement.id, input: data });
+            setEditAnnouncementModalOpen(false);
+            setSelectedAnnouncement(null);
+        } catch (error) {
+            console.error("Duyuru güncellenirken hata oluştu:", error);
+            alert("Duyuru güncellenirken hata oluştu");
+        }
+    };
+
+    const handleDeleteAnnouncement = async (id: number) => {
+        if (!confirm("Bu duyuruyu silmek istediğinizden emin misiniz?")) return;
+        try {
+            await deleteAnnouncement(id);
+        } catch (error) {
+            console.error("Duyuru silinirken hata oluştu:", error);
+            alert("Duyuru silinirken hata oluştu");
+        }
+    };
+
+    const handleEditAnnouncementClick = (announcement: AnnouncementDTO) => {
+        setSelectedAnnouncement(announcement);
+        setEditAnnouncementModalOpen(true);
     };
 
     if (loadingClubs) {
@@ -101,7 +161,7 @@ export default function ClubManagementPage() {
                         className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${activeTab === "clubs"
-                                ? "border-blue-500 text-blue-600"
+                                ? "border-indigo-500 text-indigo-600"
                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }
                         `}
@@ -113,12 +173,24 @@ export default function ClubManagementPage() {
                         className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${activeTab === "events"
-                                ? "border-blue-500 text-blue-600"
+                                ? "border-indigo-500 text-indigo-600"
                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }
                         `}
                     >
                         Etkinlik Yönetimi
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("announcements")}
+                        className={`
+                            whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                            ${activeTab === "announcements"
+                                ? "border-indigo-500 text-indigo-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            }
+                        `}
+                    >
+                        Duyuru Yönetimi
                     </button>
                 </nav>
             </div>
@@ -151,7 +223,7 @@ export default function ClubManagementPage() {
                                             {club.memberCount} üye
                                         </div>
                                         <button
-                                            onClick={() => handleCreateClick(club.id)}
+                                            onClick={() => handleCreateClick(club.id, club.name)}
                                             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow-md"
                                         >
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,6 +247,54 @@ export default function ClubManagementPage() {
                             onEdit={handleEditClick}
                             onDelete={handleDeleteEvent}
                             onClick={handleDetailClick}
+                            showActions={true}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Duyuru Yönetimi Tab */}
+            {activeTab === "announcements" && (
+                <div>
+                    {/* Kulüp Kartları - Duyuru Oluşturma */}
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Duyuru Oluştur</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {managedClubs.map((club) => (
+                                <div key={club.id} className="bg-white rounded-lg shadow-md p-6 border-2 border-gray-100 hover:border-indigo-300 transition-all hover:shadow-lg">
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{club.name}</h3>
+                                    <p className="text-gray-600 mb-4 line-clamp-3">{club.description}</p>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center text-sm text-gray-500">
+                                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            {club.memberCount} üye
+                                        </div>
+                                        <button
+                                            onClick={() => handleCreateAnnouncementClick(club.id, club.name)}
+                                            className="flex items-center gap-1.5 px-4 py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition-colors shadow-sm hover:shadow-md"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                            </svg>
+                                            Duyuru Oluştur
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Oluşturulan Duyurular */}
+                    <div>
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Oluşturduğum Duyurular</h2>
+                        <AnnouncementGridList
+                            announcements={myAnnouncements || []}
+                            loading={loadingAnnouncements}
+                            emptyMessage="Henüz duyuru oluşturmadınız. Yukarıdan bir kulüp seçerek duyuru oluşturabilirsiniz."
+                            onEdit={handleEditAnnouncementClick}
+                            onDelete={handleDeleteAnnouncement}
                             showActions={true}
                         />
                     </div>
@@ -234,6 +354,51 @@ export default function ClubManagementPage() {
                     setSelectedEvent(null);
                 }}
             />
+
+            {/* Duyuru Oluşturma Modal */}
+            <Modal
+                open={isCreateAnnouncementModalOpen}
+                onClose={() => {
+                    setCreateAnnouncementModalOpen(false);
+                    setSelectedClubId(null);
+                    setSelectedClubName("");
+                }}
+                title="Yeni Duyuru Talebi Oluştur"
+            >
+                <AnnouncementForm
+                    mode="create"
+                    clubId={selectedClubId || undefined}
+                    clubName={selectedClubName}
+                    onSubmit={handleCreateAnnouncement}
+                    submitLabel={isCreatingAnnouncement ? "Oluşturuluyor..." : "Duyuru Talebi Gönder"}
+                />
+            </Modal>
+
+            {/* Duyuru Düzenleme Modal */}
+            <Modal
+                open={isEditAnnouncementModalOpen}
+                onClose={() => {
+                    setEditAnnouncementModalOpen(false);
+                    setSelectedAnnouncement(null);
+                }}
+                title="Duyuruyu Düzenle"
+            >
+                {selectedAnnouncement && (
+                    <AnnouncementForm
+                        mode="update"
+                        defaultValues={{
+                            title: selectedAnnouncement.title,
+                            description: selectedAnnouncement.description,
+                            detailsMarkdown: selectedAnnouncement.detailsMarkdown,
+                            imageUrl: selectedAnnouncement.imageUrl,
+                            eventId: selectedAnnouncement.eventId,
+                            isActive: selectedAnnouncement.isActive,
+                        }}
+                        onSubmit={handleUpdateAnnouncement}
+                        submitLabel={isUpdatingAnnouncement ? "Güncelleniyor..." : "Güncelle"}
+                    />
+                )}
+            </Modal>
         </div>
     );
 }
