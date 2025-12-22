@@ -10,15 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateAnnouncementRequest {
     
-    @Size(max = 200, message = "Title cannot exceed 200 characters")
+    @Size(max = 200, message = "Başlık en fazla 200 karakter olabilir")
     private String title;
     
-    @Size(max = 2000, message = "Description cannot exceed 2000 characters")
+    @Size(max = 2000, message = "Açıklama en fazla 2000 karakter olabilir")
     private String description;
     
-    @Size(max = 500, message = "Image URL cannot exceed 500 characters")
+    private String detailsMarkdown;
+    
+    @Size(max = 500, message = "Resim URL'si en fazla 500 karakter olabilir")
     private String imageUrl;
     
-    private Boolean status;
+    private Boolean isActive;
+    
+    private Long eventId; // Etkinlik ilişkisini güncelleme
 }
 
