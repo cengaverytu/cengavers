@@ -81,6 +81,34 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new RuntimeException( "Role not found id=" + request.getRoleId()));
             user.setRole(role);
         }
+
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+
+        if (request.getDepartment() != null) {
+            user.setDepartment(request.getDepartment());
+        }
+
+        if (request.getClassYear() != null) {
+            user.setClassYear(request.getClassYear());
+        }
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (request.getAge() != null) {
+            user.setAge(request.getAge());
+        }
+
+        if (request.getHobby() != null) {
+            user.setHobby(request.getHobby());
+        }
     }
 
     @Override

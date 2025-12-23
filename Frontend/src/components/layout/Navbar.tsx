@@ -27,7 +27,7 @@ export default function Navbar() {
       <nav className="w-full flex items-center min-h-[72px] px-4 sm:px-6 md:px-10">
         <div className="flex items-center justify-between w-full md:w-auto">
           <div className="cursor-pointer font-bold text-2xl md:text-3xl" onClick={() => navigate("/")}>
-            ClubManagement
+            Cengavers
           </div>
 
           <button
@@ -110,12 +110,15 @@ export default function Navbar() {
                 </button>
               )}
 
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
+              <button
+                onClick={() => navigate(`/users/${me.id}`)}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+              >
                 <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
                 <span className="text-sm font-medium text-gray-700">{me.username}</span>
-              </div>
+              </button>
 
               <button
                 onClick={handleSignOut}
@@ -176,12 +179,18 @@ export default function Navbar() {
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 mb-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  navigate(`/users/${me.id}`);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 mb-2 hover:bg-gray-100 transition-colors"
+              >
                 <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
                 <span className="text-sm font-medium text-gray-700">{me.username}</span>
-              </div>
+              </button>
 
               {hasClubAccess && (
                 <button

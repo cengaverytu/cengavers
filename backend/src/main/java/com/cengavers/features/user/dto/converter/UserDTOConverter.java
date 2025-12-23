@@ -14,6 +14,13 @@ public class UserDTOConverter {
                 from.getUsername(),
                 from.getEmail(),
                 from.getRole().getId(),
+                from.getPhone(),
+                from.getDepartment(),
+                from.getClassYear(),
+                from.getFirstName(),
+                from.getLastName(),
+                from.getAge(),
+                from.getHobby(),
                 from.getCreatedAt()
         );
     }

@@ -15,4 +15,11 @@ public class UpdateUserRequest extends BaseUserRequest {
     private String email;
     private String password;
     private Long roleId;
+    private String phone;
+    private String department;
+    private String classYear;
+    private String firstName;
+    private String lastName;
+    private Integer age;
+    private String hobby;
 }
