@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./routes/HomePage";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
-import DashboardPage from "./routes/DashboardPage";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute";
 import AdminRoute from "../features/auth/components/AdminRoute";
 import AdminPanel from "./routes/AdminPanel";
@@ -17,6 +16,7 @@ import ClubManagementPage from "./routes/ClubManagementPage";
 import PublicEventsPage from "./routes/PublicEventsPage";
 import AdminEventsPage from "./routes/AdminEventsPage";
 import EventProfilePage from "./routes/EventProfilePage";
+import ClubProfilePage from "./routes/ClubProfilePage";
 
 export default function Router() {
     return (
@@ -40,9 +40,13 @@ export default function Router() {
                     <Route
                         path="/clubs"
                         element={
-                        <ProtectedRoute>
                             <ClubPage />
-                        </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/clubs/:id"
+                        element={
+                                <ClubProfilePage />
                         }
                     />
                     <Route

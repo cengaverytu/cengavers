@@ -50,3 +50,8 @@ export async function getMyAnnouncements(): Promise<AnnouncementDTO[]> {
     return res.data;
 }
 
+export async function getClubAnnouncements(clubId: number): Promise<AnnouncementDTO[]> {
+    const res = await http.get<AnnouncementDTO[]>(`/announcements/club/${clubId}`);
+    return res.data;
+}
+

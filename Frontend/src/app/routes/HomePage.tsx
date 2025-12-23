@@ -136,7 +136,11 @@ export default function HomePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {activeClubs.map((club) => (
-                <div key={club.id} className="bg-white rounded-xl transition border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200">
+                <div 
+                  key={club.id} 
+                  onClick={() => navigate(`/clubs/${club.id}`)}
+                  className="bg-white rounded-xl transition border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 cursor-pointer"
+                >
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-xl font-bold text-gray-900">{club.name}</h3>
