@@ -26,7 +26,7 @@ export default function AnnouncementDetailModal({ announcement, onClose }: Annou
             case "APPROVED":
                 return "bg-emerald-100 text-emerald-800 border-emerald-200";
             case "PENDING":
-                return "bg-amber-100 text-amber-800 border-amber-200";
+                return "bg-indigo-100 text-indigo-800 border-indigo-200";
             case "REJECTED":
                 return "bg-red-100 text-red-800 border-red-200";
             default:
@@ -49,7 +49,7 @@ export default function AnnouncementDetailModal({ announcement, onClose }: Annou
 
     const getAnnouncementType = () => {
         if (!announcement.clubId && !announcement.eventId) {
-            return { text: "Admin Duyurusu", color: "text-amber-600", icon: "🏛️" };
+            return { text: "Admin Duyurusu", color: "text-indigo-600", icon: "🏛️" };
         } else if (announcement.clubId && !announcement.eventId) {
             return { text: "Kulüp Duyurusu", color: "text-blue-600", icon: "📢" };
         } else if (announcement.clubId && announcement.eventId) {

@@ -42,7 +42,7 @@ export default function EventCard({
             case "APPROVED":
                 return "bg-emerald-100 text-emerald-800 border-emerald-200";
             case "PENDING":
-                return "bg-amber-100 text-amber-800 border-amber-200";
+                return "bg-blue-100 text-blue-800 border-blue-200";
             case "REJECTED":
                 return "bg-red-100 text-red-800 border-red-200";
             default:
@@ -76,7 +76,7 @@ export default function EventCard({
                     className="w-full h-48 object-cover"
                 />
             )}
-            <div className="p-4">
+            <div className="p-4 flex flex-col h-full">
                 <div className="flex items-start justify-between mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
                     <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${getStatusColor(event.status)}`}>
@@ -135,7 +135,7 @@ export default function EventCard({
                 </div>
 
                 {(showActions || showAdminActions || showParticipation) && (
-                    <div className="flex gap-2 mt-4 pt-3 border-t flex-wrap">
+                    <div className="flex gap-2 mt-auto pt-3 border-t flex-wrap">
                         {showActions && (
                             <>
                                 {onEdit && (
@@ -169,34 +169,36 @@ export default function EventCard({
                             </>
                         )}
 
-                        {showAdminActions && event.status === "PENDING" && (
+                        {showAdminActions && (
                             <>
-                                {onApprove && (
+                                {/* Onay butonu - duruma göre farklı metin */}
+                                {event.status !== "APPROVED" && onApprove && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onApprove(event.id);
                                         }}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-1"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        Onayla
+                                        {event.status === "PENDING" ? "Onayla" : "Onayla"}
                                     </button>
                                 )}
-                                {onReject && (
+                                {/* Red butonu - duruma göre farklı metin */}
+                                {event.status !== "REJECTED" && onReject && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onReject(event.id);
                                         }}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-1"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        Reddet
+                                        {event.status === "PENDING" ? "Reddet" : "Reddet"}
                                     </button>
                                 )}
                             </>

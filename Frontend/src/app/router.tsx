@@ -29,15 +29,6 @@ export default function Router() {
                     <Route path="/register" element={<RegisterPage />} />
 
                     <Route
-                        path="/clubs"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardPage />
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    <Route
                         path="/announcements"
                         element={
                             <ProtectedRoute>

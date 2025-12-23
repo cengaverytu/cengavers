@@ -51,13 +51,13 @@ export default function AdminPanel() {
                     onClick={() => navigate(`/admin/announcements`)}
                     className="bg-white p-6 rounded-lg shadow border border-gray-200 hover:shadow-lg hover:border-indigo-300 transition cursor-pointer group flex flex-col items-center justify-center h-48"
                 >
-                    <div className="p-3 bg-amber-100 rounded-full mb-3 group-hover:bg-amber-200 transition">
-                        <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="p-3 bg-orange-100 rounded-full mb-3 group-hover:bg-orange-200 transition">
+                        <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                         </svg>
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">Duyurular</h2>
-                    <p className="text-gray-500 text-center text-sm">Duyuruları görüntüle ve yönet</p>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Duyuru Yönetimi</h2>
+                    <p className="text-gray-500 text-center text-sm">Duyuru taleplerini yönet</p>
                 </div>
 
                 <div 
