@@ -18,6 +18,16 @@ public interface AnnouncementService {
     
     List<AnnouncementDTO> findAllActive();
     
+    List<AnnouncementDTO> getPendingAnnouncements();
+    
+    AnnouncementDTO approveAnnouncement(Long id);
+    
+    AnnouncementDTO rejectAnnouncement(Long id);
+    
+    List<AnnouncementDTO> getMyAnnouncements();
+    
+    List<AnnouncementDTO> getClubAnnouncements(Long clubId);
+    
     void deleteById(Long id);
 }
 

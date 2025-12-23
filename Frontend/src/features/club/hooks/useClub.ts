@@ -14,7 +14,8 @@ import {
     createClubRole,
     assignRole,
     getManagedClubs,
-    getPublicClubs
+    getPublicClubs,
+    getClubById
 } from "../api/clubApi";
 import { CreateClubRequest, CreateClubRoleRequest } from "../types/club";
 
@@ -24,6 +25,7 @@ const CLUB_KEYS = {
     myCreated: ["clubs", "my-created"] as const,
     myManaged: ["clubs", "my-managed"] as const,
     myJoined: ["clubs", "my-joined"] as const,
+    detail: (id: number) => ["clubs", id] as const,
     members: (id: number) => ["clubs", id, "members"] as const,
     roles: (id: number) => ["clubs", id, "roles"] as const,
 };
@@ -51,10 +53,19 @@ export function useManagedClubs(enabled: boolean = true) {
     });
 }
 
-export function useJoinedClubs() {
+export function useJoinedClubs(enabled: boolean = true) {
     return useQuery({
         queryKey: CLUB_KEYS.myJoined,
         queryFn: getJoinedClubs,
+        enabled: enabled,
+    });
+}
+
+export function useClubById(clubId: number) {
+    return useQuery({
+        queryKey: CLUB_KEYS.detail(clubId),
+        queryFn: () => getClubById(clubId),
+        enabled: !!clubId,
     });
 }
 

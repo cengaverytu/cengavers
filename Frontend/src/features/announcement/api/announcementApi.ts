@@ -30,3 +30,28 @@ export async function deleteAnnouncement(id: number): Promise<void> {
     await http.delete<void>(`/announcements/${id}`);
 }
 
+export async function getPendingAnnouncements(): Promise<AnnouncementDTO[]> {
+    const res = await http.get<AnnouncementDTO[]>("/announcements/pending");
+    return res.data;
+}
+
+export async function approveAnnouncement(id: number): Promise<AnnouncementDTO> {
+    const res = await http.put<AnnouncementDTO>(`/announcements/${id}/approve`);
+    return res.data;
+}
+
+export async function rejectAnnouncement(id: number): Promise<AnnouncementDTO> {
+    const res = await http.put<AnnouncementDTO>(`/announcements/${id}/reject`);
+    return res.data;
+}
+
+export async function getMyAnnouncements(): Promise<AnnouncementDTO[]> {
+    const res = await http.get<AnnouncementDTO[]>("/announcements/my-announcements");
+    return res.data;
+}
+
+export async function getClubAnnouncements(clubId: number): Promise<AnnouncementDTO[]> {
+    const res = await http.get<AnnouncementDTO[]>(`/announcements/club/${clubId}`);
+    return res.data;
+}
+

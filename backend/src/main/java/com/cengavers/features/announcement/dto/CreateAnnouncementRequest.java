@@ -1,6 +1,7 @@
 package com.cengavers.features.announcement.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,17 +12,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateAnnouncementRequest {
     
-    @NotBlank(message = "Title is required")
-    @Size(max = 200, message = "Title cannot exceed 200 characters")
+    @NotBlank(message = "Başlık gereklidir")
+    @Size(max = 200, message = "Başlık en fazla 200 karakter olabilir")
     private String title;
     
-    @NotBlank(message = "Description is required")
-    @Size(max = 2000, message = "Description cannot exceed 2000 characters")
+    @NotBlank(message = "Açıklama gereklidir")
+    @Size(max = 2000, message = "Açıklama en fazla 2000 karakter olabilir")
     private String description;
     
-    @Size(max = 500, message = "Image URL cannot exceed 500 characters")
+    private String detailsMarkdown;
+    
+    @Size(max = 500, message = "Resim URL'si en fazla 500 karakter olabilir")
     private String imageUrl;
     
-    private Boolean status = true;
+    private Long clubId; // Opsiyonel - Admin duyurusu için null olabilir
+    
+    private Long eventId; // Opsiyonel - Etkinlik duyurusu ise
 }
 

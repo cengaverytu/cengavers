@@ -55,5 +55,30 @@ public class AnnouncementController {
         announcementService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<AnnouncementDTO>> getPendingAnnouncements() {
+        return ResponseEntity.ok(announcementService.getPendingAnnouncements());
+    }
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<AnnouncementDTO> approve(@PathVariable Long id) {
+        return ResponseEntity.ok(announcementService.approveAnnouncement(id));
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<AnnouncementDTO> reject(@PathVariable Long id) {
+        return ResponseEntity.ok(announcementService.rejectAnnouncement(id));
+    }
+
+    @GetMapping("/my-announcements")
+    public ResponseEntity<List<AnnouncementDTO>> getMyAnnouncements() {
+        return ResponseEntity.ok(announcementService.getMyAnnouncements());
+    }
+
+    @GetMapping("/club/{clubId}")
+    public ResponseEntity<List<AnnouncementDTO>> getClubAnnouncements(@PathVariable Long clubId) {
+        return ResponseEntity.ok(announcementService.getClubAnnouncements(clubId));
+    }
 }
 

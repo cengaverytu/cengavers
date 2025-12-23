@@ -1,10 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnnouncementDTO, CreateAnnouncementInput, UpdateAnnouncementInput } from "../types/announcement";
-import { createAnnouncement, deleteAnnouncement, findAll, findAllActive, findById, updateAnnouncement } from "../api/announcementApi";
+import { 
+    createAnnouncement, 
+    deleteAnnouncement, 
+    findAll, 
+    findAllActive, 
+    findById, 
+    updateAnnouncement,
+    getPendingAnnouncements,
+    approveAnnouncement,
+    rejectAnnouncement,
+    getMyAnnouncements
+} from "../api/announcementApi";
 
 const QK = {
     announcementsAll: ["announcements"] as const,
     announcementsActive: ["announcements", "active"] as const,
+    announcementsPending: ["announcements", "pending"] as const,
+    myAnnouncements: ["announcements", "my"] as const,
     announcement: (id: number) => ["announcement", id] as const,
 };
 
@@ -64,6 +77,44 @@ export function useDeleteAnnouncement() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: QK.announcementsAll });
             qc.invalidateQueries({ queryKey: QK.announcementsActive });
+            qc.invalidateQueries({ queryKey: QK.myAnnouncements });
+        }
+    });
+}
+
+export function usePendingAnnouncements() {
+    return useQuery<AnnouncementDTO[]>({
+        queryKey: QK.announcementsPending,
+        queryFn: getPendingAnnouncements,
+    });
+}
+
+export function useMyAnnouncements() {
+    return useQuery<AnnouncementDTO[]>({
+        queryKey: QK.myAnnouncements,
+        queryFn: getMyAnnouncements,
+    });
+}
+
+export function useApproveAnnouncement() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => approveAnnouncement(id),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: QK.announcementsAll });
+            qc.invalidateQueries({ queryKey: QK.announcementsActive });
+            qc.invalidateQueries({ queryKey: QK.announcementsPending });
+        }
+    });
+}
+
+export function useRejectAnnouncement() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => rejectAnnouncement(id),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: QK.announcementsAll });
+            qc.invalidateQueries({ queryKey: QK.announcementsPending });
         }
     });
 }

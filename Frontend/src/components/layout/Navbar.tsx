@@ -27,7 +27,7 @@ export default function Navbar() {
       <nav className="w-full flex items-center min-h-[72px] px-4 sm:px-6 md:px-10">
         <div className="flex items-center justify-between w-full md:w-auto">
           <div className="cursor-pointer font-bold text-2xl md:text-3xl" onClick={() => navigate("/")}>
-            ClubManagement
+            Cengavers
           </div>
 
           <button
@@ -47,15 +47,38 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-3 ml-auto">
+          {/* Public navigation - always visible */}
+          <button
+            onClick={() => navigate("/events")}
+            className={`px-4 py-2 rounded-lg transition ${
+              isActive("/events")
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Etkinlikler
+          </button>
+
+          <button
+            onClick={() => navigate("/clubs")}
+            className={`px-4 py-2 rounded-lg transition ${
+              isActive("/clubs")
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Kulüpler
+          </button>
+
           {isLoading ? (
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
               {hasClubAccess && (
                 <button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/club-management")}
                   className={`px-4 py-2 rounded-lg transition ${
-                    isActive("/dashboard") 
+                    isActive("/club-management") 
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 hover:bg-gray-200"
                   }`}
@@ -63,16 +86,6 @@ export default function Navbar() {
                   Kulüp Yönetimi
                 </button>
               )}
-              <button
-                onClick={() => navigate("/clubs")}
-                className={`px-4 py-2 rounded-lg transition ${
-                  isActive("/clubs")
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
-                Kulüpler
-              </button>
               <button
                 onClick={() => navigate("/announcements")}
                 className={`px-4 py-2 rounded-lg transition ${
@@ -97,12 +110,15 @@ export default function Navbar() {
                 </button>
               )}
 
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
+              <button
+                onClick={() => navigate(`/users/${me.id}`)}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+              >
                 <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
                 <span className="text-sm font-medium text-gray-700">{me.username}</span>
-              </div>
+              </button>
 
               <button
                 onClick={handleSignOut}
@@ -130,25 +146,60 @@ export default function Navbar() {
         } border-t`}
       >
         <div className="px-4 sm:px-6 py-3 flex flex-col gap-3">
+          {/* Public mobile navigation */}
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/events");
+            }}
+            className={`w-full text-left px-4 py-2 rounded-lg transition ${
+              isActive("/events")
+                ? "bg-blue-600 text-white"
+                : "hover:bg-gray-100"
+            }`}
+          >
+            Etkinlikler
+          </button>
+
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/clubs");
+            }}
+            className={`w-full text-left px-4 py-2 rounded-lg transition ${
+              isActive("/clubs")
+                ? "bg-blue-600 text-white"
+                : "hover:bg-gray-100"
+            }`}
+          >
+            Kulüpler
+          </button>
+
           {isLoading ? (
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
             <>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 mb-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  navigate(`/users/${me.id}`);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 mb-2 hover:bg-gray-100 transition-colors"
+              >
                 <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
                 <span className="text-sm font-medium text-gray-700">{me.username}</span>
-              </div>
+              </button>
 
               {hasClubAccess && (
                 <button
                   onClick={() => {
                     setOpen(false);
-                    navigate("/dashboard");
+                    navigate("/club-management");
                   }}
                   className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                    isActive("/dashboard")
+                    isActive("/club-management")
                       ? "bg-blue-600 text-white"
                       : "hover:bg-gray-100"
                   }`}
@@ -156,20 +207,6 @@ export default function Navbar() {
                   Kulüp Yönetimi
                 </button>
               )}
-
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/clubs");
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                  isActive("/clubs")
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                Kulüpler
-              </button>
 
               <button
                 onClick={() => {
