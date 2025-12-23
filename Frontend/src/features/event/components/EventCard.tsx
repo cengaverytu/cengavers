@@ -65,9 +65,9 @@ export default function EventCard({
 
     return (
         <div 
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => onClick?.(event)}
-            role={onClick ? "button" : undefined}
+            className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col ${onClick && !showAdminActions ? 'cursor-pointer' : ''}`}
+            onClick={!showAdminActions && onClick ? () => onClick(event) : undefined}
+            role={onClick && !showAdminActions ? "button" : undefined}
         >
             {event.imageUrl && (
                 <img
@@ -76,7 +76,7 @@ export default function EventCard({
                     className="w-full h-48 object-cover"
                 />
             )}
-            <div className="p-4 flex flex-col h-full">
+            <div className="p-4 flex flex-col flex-1">
                 <div className="flex items-start justify-between mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
                     <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${getStatusColor(event.status)}`}>
@@ -171,34 +171,36 @@ export default function EventCard({
 
                         {showAdminActions && (
                             <>
-                                {/* Onay butonu - duruma göre farklı metin */}
-                                {event.status !== "APPROVED" && onApprove && (
+                                {/* Onay butonu */}
+                                {onApprove && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onApprove(event.id);
                                         }}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-1"
+                                        disabled={event.status === "APPROVED"}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-1 disabled:bg-gray-300 disabled:cursor-not-allowed"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {event.status === "PENDING" ? "Onayla" : "Onayla"}
+                                        {event.status === "APPROVED" ? "✓ Onaylandı" : "Onayla"}
                                     </button>
                                 )}
-                                {/* Red butonu - duruma göre farklı metin */}
-                                {event.status !== "REJECTED" && onReject && (
+                                {/* Red butonu */}
+                                {onReject && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onReject(event.id);
                                         }}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-1"
+                                        disabled={event.status === "REJECTED"}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-1 disabled:bg-gray-300 disabled:cursor-not-allowed"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {event.status === "PENDING" ? "Reddet" : "Reddet"}
+                                        {event.status === "REJECTED" ? "✗ Reddedildi" : "Reddet"}
                                     </button>
                                 )}
                             </>
