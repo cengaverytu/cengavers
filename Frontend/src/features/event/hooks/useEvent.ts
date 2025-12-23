@@ -134,3 +134,11 @@ export const useMyParticipations = () => {
     });
 };
 
+export const useEventParticipants = (eventId: number) => {
+    return useQuery({
+        queryKey: ["events", eventId, "participants"],
+        queryFn: () => eventApi.getEventParticipants(eventId),
+        enabled: !!eventId,
+    });
+};
+

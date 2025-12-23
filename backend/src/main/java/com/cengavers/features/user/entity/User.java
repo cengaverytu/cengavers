@@ -30,6 +30,27 @@ public class User {
     @JoinColumn(name = "ROLE_ID")
     private Role role;
 
+    @Column(name = "PHONE")
+    private String phone;
+
+    @Column(name = "DEPARTMENT")
+    private String department;
+
+    @Column(name = "CLASS_YEAR")
+    private String classYear;
+
+    @Column(name = "FIRST_NAME")
+    private String firstName;
+
+    @Column(name = "LAST_NAME")
+    private String lastName;
+
+    @Column(name = "AGE")
+    private Integer age;
+
+    @Column(name = "HOBBY")
+    private String hobby;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
 }

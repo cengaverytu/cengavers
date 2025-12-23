@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAllUsers, useDeleteUser } from "../hooks/useUser";
 import { useRoles } from "../../role/hooks/useRole";
 import { User } from "../types/user";
 
 export default function UserList() {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     const { data: users, isLoading: usersLoading, error: usersError } = useAllUsers();
     const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles();
@@ -117,7 +119,12 @@ export default function UserList() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-medium text-gray-900">
-                                                {user.username}
+                                                <button
+                                                    onClick={() => navigate(`/users/${user.id}`)}
+                                                    className="text-indigo-600 hover:text-indigo-900 hover:underline"
+                                                >
+                                                    {user.username}
+                                                </button>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -135,7 +142,13 @@ export default function UserList() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {formatDate(user.createdAt)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                                            <button
+                                                onClick={() => navigate(`/users/${user.id}`)}
+                                                className="text-indigo-600 hover:text-indigo-900"
+                                            >
+                                                Görüntüle
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(user.id)}
                                                 disabled={deleteUserMutation.isPending}

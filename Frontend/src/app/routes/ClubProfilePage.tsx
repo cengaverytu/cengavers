@@ -172,7 +172,8 @@ export default function ClubProfilePage() {
                                 approvedMembers.map((member) => (
                                     <div
                                         key={member.id}
-                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                                        onClick={() => navigate(`/users/${member.userId}`)}
+                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer"
                                     >
                                         <div>
                                             <p className="font-medium text-gray-900">{member.username}</p>

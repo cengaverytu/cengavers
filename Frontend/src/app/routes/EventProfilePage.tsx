@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEventById, useEvent } from "../../features/event/hooks/useEvent";
+import { useEventById, useEvent, useEventParticipants } from "../../features/event/hooks/useEvent";
 import { useClubById, useManagedClubs } from "../../features/club/hooks/useClub";
 import { useAuthUser } from "../../features/auth/hooks/useAuth";
 import { isAdmin } from "../../features/auth/utils/isAdmin";
@@ -22,7 +22,9 @@ export default function EventProfilePage() {
     const { updateEvent, deleteEvent, joinEvent, leaveEvent, isUpdating, isDeleting, isJoining, isLeaving } = useEvent();
 
     const [isEditModalOpen, setEditModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<"details" | "club">("details");
+    const [activeTab, setActiveTab] = useState<"details" | "club" | "participants">("details");
+
+    const { data: participants = [], isLoading: loadingParticipants } = useEventParticipants(eventId);
 
     if (loadingEvent || loadingClub) {
         return (
@@ -286,6 +288,16 @@ export default function EventProfilePage() {
                         >
                             Kulüp Bilgileri
                         </button>
+                        <button
+                            onClick={() => setActiveTab("participants")}
+                            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                                activeTab === "participants"
+                                    ? "border-blue-500 text-blue-600"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            }`}
+                        >
+                            Katılımcılar ({event.participantCount || 0})
+                        </button>
                     </nav>
                 </div>
 
@@ -345,6 +357,54 @@ export default function EventProfilePage() {
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {activeTab === "participants" && (
+                            <div className="bg-white rounded-lg shadow-md p-6">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                                    Katılımcılar ({participants.length})
+                                </h2>
+                                {loadingParticipants ? (
+                                    <div className="flex justify-center items-center py-8">
+                                        <div className="text-gray-600">Yükleniyor...</div>
+                                    </div>
+                                ) : participants.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        <p className="text-gray-500 text-lg">Henüz katılımcı yok</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {participants.map((participant) => (
+                                            <div
+                                                key={participant.id}
+                                                onClick={() => navigate(`/users/${participant.userId}`)}
+                                                className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                                            >
+                                                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                                    {participant.username.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-semibold text-gray-900 truncate">
+                                                        {participant.username}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 truncate">
+                                                        {participant.email}
+                                                    </p>
+                                                    <p className="text-xs text-gray-400 mt-1">
+                                                        Katıldı: {new Date(participant.joinedAt).toLocaleDateString("tr-TR")}
+                                                    </p>
+                                                </div>
+                                                <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

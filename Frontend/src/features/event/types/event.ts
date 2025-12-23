@@ -48,3 +48,11 @@ export interface EventResponse {
     isParticipating?: boolean;
 }
 
+export interface EventParticipant {
+    id: number;
+    userId: number;
+    username: string;
+    email: string;
+    joinedAt: string;
+}
+

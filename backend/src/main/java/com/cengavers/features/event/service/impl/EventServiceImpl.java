@@ -8,6 +8,7 @@ import com.cengavers.features.club.repository.ClubRepository;
 import com.cengavers.features.event.dto.converter.EventConverter;
 import com.cengavers.features.event.dto.request.CreateEventRequest;
 import com.cengavers.features.event.dto.request.UpdateEventRequest;
+import com.cengavers.features.event.dto.response.EventParticipantResponse;
 import com.cengavers.features.event.dto.response.EventResponse;
 import com.cengavers.features.event.entity.Event;
 import com.cengavers.features.event.entity.EventParticipant;
@@ -285,6 +286,24 @@ public class EventServiceImpl implements EventService {
         
         return participants.stream()
                 .map(p -> toResponseWithParticipantInfo(p.getEvent(), currentUser))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventParticipantResponse> getEventParticipants(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+        
+        List<EventParticipant> participants = eventParticipantRepository.findByEventId(eventId);
+        
+        return participants.stream()
+                .map(p -> EventParticipantResponse.builder()
+                        .id(p.getId())
+                        .userId(p.getUser().getId())
+                        .username(p.getUser().getUsername())
+                        .email(p.getUser().getEmail())
+                        .joinedAt(p.getJoinedAt())
+                        .build())
                 .collect(Collectors.toList());
     }
 }

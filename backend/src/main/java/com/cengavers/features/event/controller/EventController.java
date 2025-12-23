@@ -2,6 +2,7 @@ package com.cengavers.features.event.controller;
 
 import com.cengavers.features.event.dto.request.CreateEventRequest;
 import com.cengavers.features.event.dto.request.UpdateEventRequest;
+import com.cengavers.features.event.dto.response.EventParticipantResponse;
 import com.cengavers.features.event.dto.response.EventResponse;
 import com.cengavers.features.event.service.EventService;
 import jakarta.validation.Valid;
@@ -116,6 +117,13 @@ public class EventController {
     public ResponseEntity<List<EventResponse>> getMyParticipations() {
         List<EventResponse> events = eventService.getMyParticipations();
         return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<EventParticipantResponse>> getEventParticipants(@PathVariable Long id) {
+        log.info("Getting participants for event with id: {}", id);
+        List<EventParticipantResponse> participants = eventService.getEventParticipants(id);
+        return ResponseEntity.ok(participants);
     }
 }
 

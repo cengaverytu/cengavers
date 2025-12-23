@@ -2,6 +2,7 @@ package com.cengavers.features.event.service;
 
 import com.cengavers.features.event.dto.request.CreateEventRequest;
 import com.cengavers.features.event.dto.request.UpdateEventRequest;
+import com.cengavers.features.event.dto.response.EventParticipantResponse;
 import com.cengavers.features.event.dto.response.EventResponse;
 
 import java.util.List;
@@ -35,5 +36,7 @@ public interface EventService {
     void leaveEvent(Long id);
     
     List<EventResponse> getMyParticipations();
+    
+    List<EventParticipantResponse> getEventParticipants(Long eventId);
 }
 

@@ -1,5 +1,5 @@
 import { http } from "@/lib/http";
-import type { CreateEventInput, EventResponse, UpdateEventInput } from "../types/event";
+import type { CreateEventInput, EventParticipant, EventResponse, UpdateEventInput } from "../types/event";
 
 export const eventApi = {
     createEvent: async (data: CreateEventInput): Promise<EventResponse> => {
@@ -66,6 +66,11 @@ export const eventApi = {
 
     getMyParticipations: async (): Promise<EventResponse[]> => {
         const response = await http.get("/events/my-participations");
+        return response.data;
+    },
+
+    getEventParticipants: async (id: number): Promise<EventParticipant[]> => {
+        const response = await http.get(`/events/${id}/participants`);
         return response.data;
     },
 };
