@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AnnouncementDTO } from "../types/announcement";
@@ -9,6 +10,8 @@ interface AnnouncementDetailModalProps {
 }
 
 export default function AnnouncementDetailModal({ announcement, onClose }: AnnouncementDetailModalProps) {
+    const navigate = useNavigate();
+    
     if (!announcement) return null;
 
     const formatDate = (dateString: string) => {
@@ -19,6 +22,13 @@ export default function AnnouncementDetailModal({ announcement, onClose }: Annou
             hour: "2-digit",
             minute: "2-digit",
         });
+    };
+
+    const handleEventClick = () => {
+        if (announcement.eventId) {
+            onClose();
+            navigate(`/events/${announcement.eventId}`);
+        }
     };
 
     const getStatusColor = (status: string) => {
@@ -108,11 +118,24 @@ export default function AnnouncementDetailModal({ announcement, onClose }: Annou
                         </div>
                     )}
                     {announcement.eventTitle && (
-                        <div className="flex items-center">
-                            <svg className="w-5 h-5 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span className="font-semibold mr-2">Etkinlik:</span> {announcement.eventTitle}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <svg className="w-5 h-5 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span className="font-semibold mr-2">Etkinlik:</span> {announcement.eventTitle}
+                            </div>
+                            {announcement.eventId && (
+                                <button
+                                    onClick={handleEventClick}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                >
+                                    Etkinliğe Git
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                     )}
                     <div className="flex items-center">

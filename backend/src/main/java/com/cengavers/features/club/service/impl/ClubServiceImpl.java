@@ -84,6 +84,13 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
+    public ClubResponse getClubById(Long clubId) {
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+        return mapToClubResponse(club);
+    }
+
+    @Override
     public List<ClubResponse> getAllClubs() {
         User currentUser = getCurrentUserEntity();
         

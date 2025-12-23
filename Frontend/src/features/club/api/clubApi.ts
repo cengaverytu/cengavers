@@ -75,3 +75,8 @@ export async function createClubRole(data: CreateClubRoleRequest): Promise<ClubR
 export async function assignRole(memberId: number, roleId: number): Promise<void> {
     await http.post<void>(`/club/member/${memberId}/assign-role/${roleId}`);
 }
+
+export async function getClubById(id: number): Promise<ClubResponse> {
+    const res = await http.get<ClubResponse>(`/club/${id}`);
+    return res.data;
+}

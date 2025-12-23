@@ -86,6 +86,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/messages/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/announcements/active").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/club/public").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/club/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events/approved").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events/{id}").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/docs/**").permitAll()
                         .requestMatchers(

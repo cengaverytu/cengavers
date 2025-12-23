@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useManagedClubs } from "../../features/club/hooks/useClub";
 import { useMyClubEvents, useEvent } from "../../features/event/hooks/useEvent";
 import { useMyAnnouncements, useCreateAnnouncement, useUpdateAnnouncement, useDeleteAnnouncement } from "../../features/announcement/hooks/useAnnouncement";
@@ -6,13 +7,13 @@ import ClubManager from "../../features/club/components/ClubManager";
 import Modal from "../../components/ui/Modal";
 import EventForm from "../../features/event/components/EventForm";
 import EventList from "../../features/event/components/EventList";
-import EventDetailModal from "../../features/event/components/EventDetailModal";
 import AnnouncementForm from "../../features/announcement/components/AnnouncementForm";
 import AnnouncementGridList from "../../features/announcement/components/AnnouncementGridList";
 import { CreateEventInput, EventResponse, UpdateEventInput } from "../../features/event/types/event";
 import { CreateAnnouncementInput, UpdateAnnouncementInput, AnnouncementDTO } from "../../features/announcement/types/announcement";
 
 export default function ClubManagementPage() {
+    const navigate = useNavigate();
     const { data: managedClubs, isLoading: loadingClubs } = useManagedClubs();
     const { data: myEvents, isLoading: loadingEvents } = useMyClubEvents();
     const { data: myAnnouncements, isLoading: loadingAnnouncements } = useMyAnnouncements();
@@ -24,7 +25,6 @@ export default function ClubManagementPage() {
     const [activeTab, setActiveTab] = useState<"clubs" | "events" | "announcements">("clubs");
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
-    const [isDetailModalOpen, setDetailModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(null);
     const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
     const [selectedClubName, setSelectedClubName] = useState<string>("");
@@ -73,8 +73,7 @@ export default function ClubManagementPage() {
     };
 
     const handleDetailClick = (event: EventResponse) => {
-        setSelectedEvent(event);
-        setDetailModalOpen(true);
+        navigate(`/events/${event.id}`);
     };
 
     const handleCreateClick = (clubId: number, clubName: string) => {
@@ -344,16 +343,6 @@ export default function ClubManagementPage() {
                     />
                 )}
             </Modal>
-
-            {/* Etkinlik Detay Modal */}
-            <EventDetailModal
-                event={selectedEvent}
-                open={isDetailModalOpen}
-                onClose={() => {
-                    setDetailModalOpen(false);
-                    setSelectedEvent(null);
-                }}
-            />
 
             {/* Duyuru Oluşturma Modal */}
             <Modal
