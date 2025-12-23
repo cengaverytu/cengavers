@@ -29,14 +29,20 @@ export default function ClubPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Kulüpler</h1>
-                <button
-                    onClick={() => setCreateModalOpen(true)}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-                >
-                    Yeni Kulüp Oluştur
-                </button>
+            <div className="mb-8">
+                <div className="flex justify-between items-center mb-2">
+                    <h1 className="text-3xl font-bold text-gray-900">Kulüpler</h1>
+                    <button
+                        onClick={() => setCreateModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow-md"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Yeni Kulüp İsteği Oluştur
+                    </button>
+                </div>
+                <p className="text-gray-600">Kulüplere katılın veya kendi kulübünüzü oluşturun</p>
             </div>
 
             <ClubList 

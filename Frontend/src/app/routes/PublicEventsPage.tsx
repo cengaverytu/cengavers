@@ -39,15 +39,15 @@ export default function PublicEventsPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Etkinlikler</h1>
+            <div className="mb-8 text-center">
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">Etkinlikler</h1>
                 <p className="text-gray-600">Yaklaşan ve güncel etkinliklere göz atın ve katılın!</p>
             </div>
 
             <EventList
                 events={events || []}
                 loading={isLoading || isJoining || isLeaving}
-                emptyMessage="Henüz onaylanmış etkinlik bulunmuyor."
+                emptyMessage="Şu an onaylanmış etkinlik bulunmamaktadır."
                 onJoin={handleJoin}
                 onLeave={handleLeave}
                 onClick={handleDetailClick}

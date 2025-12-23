@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { 
+    useAnnouncements,
     usePendingAnnouncements, 
     useDeleteAnnouncement, 
     useCreateAnnouncement, 
@@ -10,14 +11,18 @@ import {
 import { AnnouncementDTO, CreateAnnouncementInput, UpdateAnnouncementInput } from "../types/announcement";
 import AnnouncementForm from "./AnnouncementForm";
 import AnnouncementGridList from "./AnnouncementGridList";
+import AnnouncementDetailModal from "./AnnouncementDetailModal";
 import Modal from "../../../components/ui/Modal";
 import { useNavigate } from "react-router";
 
 export default function AnnouncementList() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingAnnouncement, setEditingAnnouncement] = useState<AnnouncementDTO | null>(null);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementDTO | null>(null);
+    const [activeTab, setActiveTab] = useState<"pending" | "approved" | "rejected" | "all">("pending");
     
-    const { data: announcements, isLoading } = usePendingAnnouncements();
+    const { data: allAnnouncements, isLoading: loadingAll } = useAnnouncements();
+    const { data: pendingAnnouncements, isLoading: loadingPending } = usePendingAnnouncements();
     const { mutateAsync: deleteAnnouncement } = useDeleteAnnouncement();
     const { mutateAsync: createAnnouncement, isPending: isCreating } = useCreateAnnouncement();
     const { mutateAsync: updateAnnouncement, isPending: isUpdating } = useUpdateAnnouncement();
@@ -25,6 +30,26 @@ export default function AnnouncementList() {
     const { mutateAsync: rejectAnnouncement } = useRejectAnnouncement();
 
     const navigate = useNavigate();
+
+    // Filtreleme
+    const getFilteredAnnouncements = (): AnnouncementDTO[] => {
+        const all = allAnnouncements || [];
+        switch (activeTab) {
+            case "pending":
+                return pendingAnnouncements || [];
+            case "approved":
+                return all.filter((a: AnnouncementDTO) => a.approvalStatus === "APPROVED");
+            case "rejected":
+                return all.filter((a: AnnouncementDTO) => a.approvalStatus === "REJECTED");
+            case "all":
+                return all;
+            default:
+                return pendingAnnouncements || [];
+        }
+    };
+
+    const filteredAnnouncements = getFilteredAnnouncements();
+    const isLoading = activeTab === "pending" ? loadingPending : loadingAll;
 
     const handleDelete = async (id: number) => {
         if (window.confirm("Bu duyuruyu silmek istediğinize emin misiniz?")) {
@@ -103,7 +128,7 @@ export default function AnnouncementList() {
                     </button>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow-md"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -113,16 +138,76 @@ export default function AnnouncementList() {
                 </div>
             </div>
 
-            <AnnouncementGridList
-                announcements={announcements || []}
-                loading={isLoading}
-                emptyMessage="Bekleyen duyuru talebi bulunmuyor."
-                onEdit={setEditingAnnouncement}
-                onDelete={handleDelete}
-                onApprove={handleApprove}
-                onReject={handleReject}
-                showAdminActions={true}
-            />
+            {/* Tab Navigation */}
+            <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                    <button
+                        onClick={() => setActiveTab("pending")}
+                        className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                            activeTab === "pending"
+                                ? "border-indigo-500 text-indigo-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
+                    >
+                        Bekleyen Talepler
+                        {pendingAnnouncements && pendingAnnouncements.length > 0 && (
+                            <span className="ml-2 bg-indigo-100 text-indigo-800 py-0.5 px-2 rounded-full text-xs font-semibold">
+                                {pendingAnnouncements.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("approved")}
+                        className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                            activeTab === "approved"
+                                ? "border-emerald-500 text-emerald-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
+                    >
+                        Onaylanan Duyurular
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("rejected")}
+                        className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                            activeTab === "rejected"
+                                ? "border-red-500 text-red-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
+                    >
+                        Reddedilen Duyurular
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("all")}
+                        className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                            activeTab === "all"
+                                ? "border-indigo-500 text-indigo-600"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
+                    >
+                        Tümü
+                    </button>
+                </nav>
+            </div>
+
+            {/* Duyuru Listesi */}
+            <div>
+                <AnnouncementGridList
+                    announcements={filteredAnnouncements}
+                    loading={isLoading}
+                    emptyMessage={
+                        activeTab === "pending" ? "Şu an bekleyen duyuru talebi bulunmamaktadır." :
+                        activeTab === "approved" ? "Şu an onaylanmış duyuru bulunmamaktadır." :
+                        activeTab === "rejected" ? "Şu an reddedilmiş duyuru bulunmamaktadır." :
+                        "Şu an hiç duyuru bulunmamaktadır."
+                    }
+                    onEdit={setEditingAnnouncement}
+                    onDelete={handleDelete}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                    onClick={setSelectedAnnouncement}
+                    showAdminActions={true}
+                />
+            </div>
 
             {/* Create Modal - Admin Duyurusu */}
             <Modal
@@ -160,6 +245,12 @@ export default function AnnouncementList() {
                     />
                 )}
             </Modal>
+
+            {/* Detail Modal - Duyuru İçeriğini Görmek İçin */}
+            <AnnouncementDetailModal
+                announcement={selectedAnnouncement}
+                onClose={() => setSelectedAnnouncement(null)}
+            />
         </div>
     );
 }

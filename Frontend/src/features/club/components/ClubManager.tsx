@@ -38,10 +38,10 @@ export default function ClubManager({ club }: Props) {
         <div className="bg-white shadow rounded-lg p-6 mb-8">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">{club.name} Yönetimi</h2>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                    club.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                    club.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
+                <span className={`px-2 py-1 text-xs rounded-full border ${
+                    club.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                    club.status === 'REJECTED' ? 'bg-red-100 text-red-800 border-red-200' :
+                    'bg-blue-100 text-blue-800 border-blue-200'
                 }`}>
                     {club.status}
                 </span>
