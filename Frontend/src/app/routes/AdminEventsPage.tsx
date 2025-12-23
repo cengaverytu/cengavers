@@ -1,17 +1,14 @@
-import { useState } from "react";
 import { usePendingEvents, useEvents, useEvent } from "../../features/event/hooks/useEvent";
 import EventList from "../../features/event/components/EventList";
-import EventDetailModal from "../../features/event/components/EventDetailModal";
 import { EventResponse } from "../../features/event/types/event";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function AdminEventsPage() {
     const { data: allEvents, isLoading: loadingAll } = useEvents();
     const { data: pendingEvents, isLoading: loadingPending } = usePendingEvents();
     const { approveEvent, rejectEvent, isApproving, isRejecting } = useEvent();
     
-    const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(null);
-    const [isDetailModalOpen, setDetailModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<"pending" | "approved" | "rejected" | "all">("pending");
     const navigate = useNavigate();
 
@@ -38,8 +35,7 @@ export default function AdminEventsPage() {
     };
 
     const handleDetailClick = (event: EventResponse) => {
-        setSelectedEvent(event);
-        setDetailModalOpen(true);
+        navigate(`/events/${event.id}`);
     };
 
     // Filtreleme
@@ -144,15 +140,6 @@ export default function AdminEventsPage() {
                 onReject={handleReject}
                 onClick={handleDetailClick}
                 showAdminActions={true}
-            />
-
-            <EventDetailModal
-                event={selectedEvent}
-                open={isDetailModalOpen}
-                onClose={() => {
-                    setDetailModalOpen(false);
-                    setSelectedEvent(null);
-                }}
             />
         </div>
     );

@@ -47,6 +47,18 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-3 ml-auto">
+          {/* Public navigation - always visible */}
+          <button
+            onClick={() => navigate("/events")}
+            className={`px-4 py-2 rounded-lg transition ${
+              isActive("/events")
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Etkinlikler
+          </button>
+
           {isLoading ? (
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
@@ -72,16 +84,6 @@ export default function Navbar() {
                 }`}
               >
                 Kulüpler
-              </button>
-              <button
-                onClick={() => navigate("/events")}
-                className={`px-4 py-2 rounded-lg transition ${
-                  isActive("/events")
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
-                Etkinlikler
               </button>
               <button
                 onClick={() => navigate("/announcements")}
@@ -140,6 +142,21 @@ export default function Navbar() {
         } border-t`}
       >
         <div className="px-4 sm:px-6 py-3 flex flex-col gap-3">
+          {/* Public mobile navigation */}
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/events");
+            }}
+            className={`w-full text-left px-4 py-2 rounded-lg transition ${
+              isActive("/events")
+                ? "bg-blue-600 text-white"
+                : "hover:bg-gray-100"
+            }`}
+          >
+            Etkinlikler
+          </button>
+
           {isLoading ? (
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
@@ -179,20 +196,6 @@ export default function Navbar() {
                 }`}
               >
                 Kulüpler
-              </button>
-
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/events");
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                  isActive("/events")
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                Etkinlikler
               </button>
 
               <button

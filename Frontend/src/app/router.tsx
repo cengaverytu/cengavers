@@ -16,6 +16,7 @@ import AdminClubsPage from "./routes/AdminClubsPage";
 import ClubManagementPage from "./routes/ClubManagementPage";
 import PublicEventsPage from "./routes/PublicEventsPage";
 import AdminEventsPage from "./routes/AdminEventsPage";
+import EventProfilePage from "./routes/EventProfilePage";
 
 export default function Router() {
     return (
@@ -52,14 +53,8 @@ export default function Router() {
                         </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path="/events"
-                        element={
-                        <ProtectedRoute>
-                            <PublicEventsPage />
-                        </ProtectedRoute>
-                        }
-                    />
+                    <Route path="/events" element={<PublicEventsPage />} />
+                    <Route path="/events/:id" element={<EventProfilePage />} />
                     <Route element={<AdminRoute />}>
                         <Route path="/admin" element={<AdminPanel />} />
                         <Route path="/admin/users" element={<AdminUsersPage />} />

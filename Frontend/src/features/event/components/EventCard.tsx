@@ -65,7 +65,7 @@ export default function EventCard({
 
     return (
         <div 
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => onClick?.(event)}
             role={onClick ? "button" : undefined}
         >
