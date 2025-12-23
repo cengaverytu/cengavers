@@ -211,6 +211,16 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     }
 
     @Override
+    public List<AnnouncementDTO> getClubAnnouncements(Long clubId) {
+        // Kulübün onaylı ve aktif duyurularını getir
+        return announcementRepository.findByClubIdAndApprovalStatusAndIsActiveTrueOrderByCreatedAtDesc(
+                clubId, AnnouncementStatus.APPROVED)
+                .stream()
+                .map(announcementDTOConverter::convert)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void deleteById(Long id) {
         User currentUser = getCurrentUserEntity();

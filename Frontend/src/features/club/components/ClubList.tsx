@@ -1,6 +1,7 @@
 import { ClubResponse } from "../types/club";
 import { useJoinClub, useLeaveClub, useApproveClub, useRejectClub } from "../hooks/useClub";
 import { useAuthUser } from "../../auth/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
     clubs: ClubResponse[];
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function ClubList({ clubs, title, showJoinButton, showLeaveButton, showStatus, showAdminActions }: Props) {
+    const navigate = useNavigate();
     const { mutate: joinClub, isPending: isJoining } = useJoinClub();
     const { mutate: leaveClub, isPending: isLeaving } = useLeaveClub();
     const { mutate: approveClub, isPending: isApproving } = useApproveClub();
@@ -19,7 +21,59 @@ export default function ClubList({ clubs, title, showJoinButton, showLeaveButton
     
     const { data: user } = useAuthUser();
 
-    console.log(user);
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+                <div className="container mx-auto px-4 py-16">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Hero Section */}
+                        <div className="text-center mb-12">
+                            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full mb-6 shadow-lg">
+                                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
+                                Kulüplere Katılın!
+                            </h1>
+                        </div>
+
+                        {/* CTA Buttons */}
+                        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                                Hesabınızı Oluşturun! 🚀
+                            </h2>
+                            <p className="text-gray-600 mb-8 max-w-xl mx-auto">
+                                Hesap oluşturun ve kampüsümüzdeki tüm etkinliklere erişim sağlayın. 
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <button
+                                    onClick={() => navigate("/register")}
+                                    className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                    </svg>
+                                    Ücretsiz Kayıt Ol
+                                </button>
+                                <button
+                                    onClick={() => navigate("/login")}
+                                    className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-700 text-lg font-semibold rounded-xl border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 transition-all"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                    </svg>
+                                    Giriş Yap
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
 
     if (!clubs || clubs.length === 0) {
         return (
@@ -35,7 +89,11 @@ export default function ClubList({ clubs, title, showJoinButton, showLeaveButton
             <h3 className="text-xl font-semibold mb-4">{title}</h3>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {clubs.map((club) => (
-                    <div key={club.id} className="bg-white p-6 rounded-lg shadow-md border-2 border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all">
+                    <div 
+                        key={club.id} 
+                        className="bg-white p-6 rounded-lg shadow-md border-2 border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all cursor-pointer"
+                        onClick={() => navigate(`/clubs/${club.id}`)}
+                    >
                         <div className="flex justify-between items-start mb-3">
                             <h4 className="text-xl font-bold text-gray-900">{club.name}</h4>
                             {showStatus && (

@@ -26,6 +26,8 @@ public interface AnnouncementService {
     
     List<AnnouncementDTO> getMyAnnouncements();
     
+    List<AnnouncementDTO> getClubAnnouncements(Long clubId);
+    
     void deleteById(Long id);
 }
 

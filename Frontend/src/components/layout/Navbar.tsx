@@ -59,6 +59,17 @@ export default function Navbar() {
             Etkinlikler
           </button>
 
+          <button
+            onClick={() => navigate("/clubs")}
+            className={`px-4 py-2 rounded-lg transition ${
+              isActive("/clubs")
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Kulüpler
+          </button>
+
           {isLoading ? (
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
@@ -75,16 +86,6 @@ export default function Navbar() {
                   Kulüp Yönetimi
                 </button>
               )}
-              <button
-                onClick={() => navigate("/clubs")}
-                className={`px-4 py-2 rounded-lg transition ${
-                  isActive("/clubs")
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
-                Kulüpler
-              </button>
               <button
                 onClick={() => navigate("/announcements")}
                 className={`px-4 py-2 rounded-lg transition ${
@@ -157,6 +158,20 @@ export default function Navbar() {
             Etkinlikler
           </button>
 
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/clubs");
+            }}
+            className={`w-full text-left px-4 py-2 rounded-lg transition ${
+              isActive("/clubs")
+                ? "bg-blue-600 text-white"
+                : "hover:bg-gray-100"
+            }`}
+          >
+            Kulüpler
+          </button>
+
           {isLoading ? (
             <div className="w-24 h-6 bg-gray-300 animate-pulse rounded" />
           ) : me ? (
@@ -183,20 +198,6 @@ export default function Navbar() {
                   Kulüp Yönetimi
                 </button>
               )}
-
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/clubs");
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                  isActive("/clubs")
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                Kulüpler
-              </button>
 
               <button
                 onClick={() => {

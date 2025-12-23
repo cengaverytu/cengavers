@@ -75,5 +75,10 @@ public class AnnouncementController {
     public ResponseEntity<List<AnnouncementDTO>> getMyAnnouncements() {
         return ResponseEntity.ok(announcementService.getMyAnnouncements());
     }
+
+    @GetMapping("/club/{clubId}")
+    public ResponseEntity<List<AnnouncementDTO>> getClubAnnouncements(@PathVariable Long clubId) {
+        return ResponseEntity.ok(announcementService.getClubAnnouncements(clubId));
+    }
 }
 

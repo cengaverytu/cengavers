@@ -53,10 +53,11 @@ export function useManagedClubs(enabled: boolean = true) {
     });
 }
 
-export function useJoinedClubs() {
+export function useJoinedClubs(enabled: boolean = true) {
     return useQuery({
         queryKey: CLUB_KEYS.myJoined,
         queryFn: getJoinedClubs,
+        enabled: enabled,
     });
 }
 
