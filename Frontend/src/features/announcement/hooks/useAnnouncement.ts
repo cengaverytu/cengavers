@@ -10,7 +10,8 @@ import {
     getPendingAnnouncements,
     approveAnnouncement,
     rejectAnnouncement,
-    getMyAnnouncements
+    getMyAnnouncements,
+    getClubAnnouncements
 } from "../api/announcementApi";
 
 const QK = {
@@ -18,6 +19,7 @@ const QK = {
     announcementsActive: ["announcements", "active"] as const,
     announcementsPending: ["announcements", "pending"] as const,
     myAnnouncements: ["announcements", "my"] as const,
+    clubAnnouncements: (clubId: number) => ["announcements", "club", clubId] as const,
     announcement: (id: number) => ["announcement", id] as const,
 };
 
@@ -116,6 +118,15 @@ export function useRejectAnnouncement() {
             qc.invalidateQueries({ queryKey: QK.announcementsAll });
             qc.invalidateQueries({ queryKey: QK.announcementsPending });
         }
+    });
+}
+
+export function useClubAnnouncements(clubId: number) {
+    return useQuery<AnnouncementDTO[]>({
+        queryKey: QK.clubAnnouncements(clubId),
+        queryFn: () => getClubAnnouncements(clubId),
+        enabled: !!clubId,
+        staleTime: 60_000
     });
 }
 
