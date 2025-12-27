@@ -1,14 +1,23 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApprovedEvents, useEvent } from "../../features/event/hooks/useEvent";
+import { useApprovedEvents, useEventsByClubId, useEvent } from "../../features/event/hooks/useEvent";
 import { useAuthUser } from "../../features/auth/hooks/useAuth";
+import { usePublicClubs } from "../../features/club/hooks/useClub";
 import EventList from "../../features/event/components/EventList";
 import { EventResponse } from "../../features/event/types/event";
 
 export default function PublicEventsPage() {
-    const { data: events, isLoading } = useApprovedEvents();
+    const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
+    const { data: allEvents, isLoading: isLoadingAllEvents } = useApprovedEvents();
+    const { data: clubEvents, isLoading: isLoadingClubEvents } = useEventsByClubId(selectedClubId || 0);
+    const { data: clubs, isLoading: isLoadingClubs } = usePublicClubs();
     const { data: me, isLoading: isLoadingAuth } = useAuthUser();
     const { joinEvent, leaveEvent, isJoining, isLeaving } = useEvent();
     const navigate = useNavigate();
+
+    // Determine which events to show based on filter
+    const events = selectedClubId ? clubEvents : allEvents;
+    const isLoading = isLoadingAuth || (selectedClubId ? isLoadingClubEvents : isLoadingAllEvents) || isLoadingClubs;
 
     const handleJoin = async (id: number) => {
         if (!me) {
@@ -40,6 +49,24 @@ export default function PublicEventsPage() {
 
     const handleDetailClick = (event: EventResponse) => {
         navigate(`/events/${event.id}`);
+    };
+
+    const handleClubFilterChange = (clubId: string) => {
+        if (clubId === "") {
+            setSelectedClubId(null);
+        } else {
+            setSelectedClubId(parseInt(clubId, 10));
+        }
+    };
+
+    const getEmptyMessage = () => {
+        if (selectedClubId) {
+            const selectedClub = clubs?.find(club => club.id === selectedClubId);
+            return selectedClub 
+                ? `${selectedClub.name} kulübüne ait etkinlik bulunamadı.`
+                : "Bu kulübe ait etkinlik bulunamadı.";
+        }
+        return "Şu an onaylanmış etkinlik bulunmamaktadır.";
     };
 
     // Show loading state
@@ -113,10 +140,37 @@ export default function PublicEventsPage() {
                 <p className="text-gray-600">Yaklaşan ve güncel etkinliklere göz atın ve katılın!</p>
             </div>
 
+            {/* Club Filter */}
+            <div className="mb-6 max-w-md mx-auto">
+                <label htmlFor="club-filter" className="block text-sm font-medium text-gray-700 mb-2">
+                    Kulüp Filtresi
+                </label>
+                <div className="relative">
+                    <select
+                        id="club-filter"
+                        value={selectedClubId || ""}
+                        onChange={(e) => handleClubFilterChange(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 appearance-none cursor-pointer"
+                    >
+                        <option value="">Tümü</option>
+                        {clubs?.map((club) => (
+                            <option key={club.id} value={club.id}>
+                                {club.name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
             <EventList
                 events={events || []}
                 loading={isLoading || isJoining || isLeaving}
-                emptyMessage="Şu an onaylanmış etkinlik bulunmamaktadır."
+                emptyMessage={getEmptyMessage()}
                 onJoin={handleJoin}
                 onLeave={handleLeave}
                 onClick={handleDetailClick}
