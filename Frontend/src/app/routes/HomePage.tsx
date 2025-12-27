@@ -1,10 +1,116 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMessages } from "../../features/message/hooks/useMessage.ts";
 import { usePublicClubs } from "../../features/club/hooks/useClub";
 import { useApprovedEvents } from "../../features/event/hooks/useEvent";
 import { useAuthUser } from "../../features/auth/hooks/useAuth";
 import UserAnnouncementsPage from "./UserAnnouncementsPage.tsx";
-import EventCard from "../../features/event/components/EventCard";
+import EventList from "../../features/event/components/EventList";
+import { ClubResponse } from "../../features/club/types/club";
+
+// Clubs List with Pagination Component
+function ClubsListWithPagination({
+  clubs,
+  currentPage,
+  itemsPerPage,
+  onPageChange,
+  onClubClick,
+}: {
+  clubs: ClubResponse[];
+  currentPage: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  onClubClick: (clubId: number) => void;
+}) {
+  const totalPages = Math.ceil(clubs.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedClubs = clubs.slice(startIndex, endIndex);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {paginatedClubs.map((club) => (
+          <div
+            key={club.id}
+            onClick={() => onClubClick(club.id)}
+            className="bg-white rounded-xl transition border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 cursor-pointer"
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-bold text-gray-900">{club.name}</h3>
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                  {club.memberCount} Üye
+                </span>
+              </div>
+              <p className="text-gray-600 mb-4 line-clamp-3 h-12">
+                {club.description}
+              </p>
+              <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-50">
+                <span>Kurucu: {club.ownerUsername}</span>
+                <span>{new Date(club.createdAt).toLocaleDateString('tr-TR')}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Önceki
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+              // Show first page, last page, current page, and pages around current
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <button
+                    key={page}
+                    onClick={() => onPageChange(page)}
+                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      currentPage === page
+                        ? "bg-indigo-600 text-white"
+                        : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              } else if (
+                page === currentPage - 2 ||
+                page === currentPage + 2
+              ) {
+                return (
+                  <span key={page} className="px-2 text-gray-500">
+                    ...
+                  </span>
+                );
+              }
+              return null;
+            })}
+          </div>
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Sonraki
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -14,10 +120,27 @@ export default function HomePage() {
   const { data: me, isLoading: isLoadingAuth } = useAuthUser();
   const activeMessage = messages?.find(m => m.status === true);
   const activeClubs = clubs || [];
-  const upcomingEvents = events?.slice(0, 6) || [];
+  const upcomingEvents = events || [];
+  
+  // Pagination states
+  const [eventsCurrentPage, setEventsCurrentPage] = useState<number>(1);
+  const [clubsCurrentPage, setClubsCurrentPage] = useState<number>(1);
+  const eventsItemsPerPage = 3;
+  const clubsItemsPerPage = 3;
   
   // Determine if user is authenticated (after loading)
   const isAuthenticated = !isLoadingAuth && !!me;
+
+  // Pagination handlers
+  const handleEventsPageChange = (page: number) => {
+    setEventsCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleClubsPageChange = (page: number) => {
+    setClubsCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -98,25 +221,16 @@ export default function HomePage() {
                   </button>
                 </div>
               </div>
-            ) : upcomingEvents.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p className="text-gray-500 text-lg">Henüz yaklaşan etkinlik bulunmuyor.</p>
-              </div>
             ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {upcomingEvents.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      onClick={(e) => navigate(`/events/${e.id}`)}
-                    />
-                  ))}
-                </div>
-              </>
+              <EventList
+                events={upcomingEvents}
+                loading={false}
+                emptyMessage="Henüz yaklaşan etkinlik bulunmuyor."
+                onClick={(event) => navigate(`/events/${event.id}`)}
+                currentPage={eventsCurrentPage}
+                itemsPerPage={eventsItemsPerPage}
+                onPageChange={handleEventsPageChange}
+              />
             )}
           </div>
         </div>
@@ -134,31 +248,13 @@ export default function HomePage() {
               <p className="text-gray-500 text-lg">Henüz aktif bir kulüp bulunmuyor.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeClubs.map((club) => (
-                <div 
-                  key={club.id} 
-                  onClick={() => navigate(`/clubs/${club.id}`)}
-                  className="bg-white rounded-xl transition border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 cursor-pointer"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-gray-900">{club.name}</h3>
-                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-                        {club.memberCount} Üye
-                      </span>
-                    </div>
-                    <p className="text-gray-600 mb-4 line-clamp-3 h-12">
-                      {club.description}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-50">
-                      <span>Kurucu: {club.ownerUsername}</span>
-                      <span>{new Date(club.createdAt).toLocaleDateString('tr-TR')}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ClubsListWithPagination
+              clubs={activeClubs}
+              currentPage={clubsCurrentPage}
+              itemsPerPage={clubsItemsPerPage}
+              onPageChange={handleClubsPageChange}
+              onClubClick={(clubId) => navigate(`/clubs/${clubId}`)}
+            />
           )}
         </div>
         </main>

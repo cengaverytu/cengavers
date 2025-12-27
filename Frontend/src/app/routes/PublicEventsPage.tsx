@@ -8,6 +8,11 @@ import { EventResponse } from "../../features/event/types/event";
 
 export default function PublicEventsPage() {
     const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
+<<<<<<< HEAD
+=======
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 3;
+>>>>>>> 99be570 (CCS-90)
     const { data: allEvents, isLoading: isLoadingAllEvents } = useApprovedEvents();
     const { data: clubEvents, isLoading: isLoadingClubEvents } = useEventsByClubId(selectedClubId || 0);
     const { data: clubs, isLoading: isLoadingClubs } = usePublicClubs();
@@ -52,6 +57,10 @@ export default function PublicEventsPage() {
     };
 
     const handleClubFilterChange = (clubId: string) => {
+<<<<<<< HEAD
+=======
+        setCurrentPage(1); // Reset to first page when filter changes
+>>>>>>> 99be570 (CCS-90)
         if (clubId === "") {
             setSelectedClubId(null);
         } else {
@@ -59,6 +68,15 @@ export default function PublicEventsPage() {
         }
     };
 
+<<<<<<< HEAD
+=======
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        // Scroll to top when page changes
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+>>>>>>> 99be570 (CCS-90)
     const getEmptyMessage = () => {
         if (selectedClubId) {
             const selectedClub = clubs?.find(club => club.id === selectedClubId);
@@ -175,6 +193,9 @@ export default function PublicEventsPage() {
                 onLeave={handleLeave}
                 onClick={handleDetailClick}
                 showParticipation={true}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
             />
         </div>
     );
