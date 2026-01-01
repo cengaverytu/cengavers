@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { 
     useAnnouncements,
     usePendingAnnouncements, 
@@ -13,6 +13,7 @@ import AnnouncementForm from "./AnnouncementForm";
 import AnnouncementGridList from "./AnnouncementGridList";
 import AnnouncementDetailModal from "./AnnouncementDetailModal";
 import Modal from "../../../components/ui/Modal";
+import AdminListControls from "../../../components/ui/AdminListControls";
 import { useNavigate } from "react-router";
 
 export default function AnnouncementList() {
@@ -20,6 +21,19 @@ export default function AnnouncementList() {
     const [editingAnnouncement, setEditingAnnouncement] = useState<AnnouncementDTO | null>(null);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementDTO | null>(null);
     const [activeTab, setActiveTab] = useState<"pending" | "approved" | "rejected" | "all">("pending");
+    
+    // Search, Sort, Pagination states
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "title-asc" | "title-desc">("date-desc");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+
+    const sortOptions = [
+        { value: "date-desc", label: "En Yeni" },
+        { value: "date-asc", label: "En Eski" },
+        { value: "title-asc", label: "Başlık (A-Z)" },
+        { value: "title-desc", label: "Başlık (Z-A)" },
+    ];
     
     const { data: allAnnouncements, isLoading: loadingAll } = useAnnouncements();
     const { data: pendingAnnouncements, isLoading: loadingPending } = usePendingAnnouncements();
@@ -31,25 +45,77 @@ export default function AnnouncementList() {
 
     const navigate = useNavigate();
 
-    // Filtreleme
-    const getFilteredAnnouncements = (): AnnouncementDTO[] => {
-        const all = allAnnouncements || [];
+    // Filter, Search, Sort
+    const filteredAndSortedAnnouncements = useMemo(() => {
+        let result: AnnouncementDTO[] = [];
+        
+        // Tab filter
         switch (activeTab) {
             case "pending":
-                return pendingAnnouncements || [];
+                result = pendingAnnouncements || [];
+                break;
             case "approved":
-                return all.filter((a: AnnouncementDTO) => a.approvalStatus === "APPROVED");
+                result = (allAnnouncements || []).filter((a: AnnouncementDTO) => a.approvalStatus === "APPROVED");
+                break;
             case "rejected":
-                return all.filter((a: AnnouncementDTO) => a.approvalStatus === "REJECTED");
+                result = (allAnnouncements || []).filter((a: AnnouncementDTO) => a.approvalStatus === "REJECTED");
+                break;
             case "all":
-                return all;
+                result = allAnnouncements || [];
+                break;
             default:
-                return pendingAnnouncements || [];
+                result = pendingAnnouncements || [];
         }
+
+        // Search filter
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase().trim();
+            result = result.filter((a: AnnouncementDTO) => 
+                a.title?.toLowerCase().includes(query) ||
+                a.description?.toLowerCase().includes(query)
+            );
+        }
+
+        // Sort
+        result = [...result].sort((a, b) => {
+            switch (sortBy) {
+                case "date-desc":
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                case "date-asc":
+                    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                case "title-asc":
+                    return (a.title || "").localeCompare(b.title || "", "tr");
+                case "title-desc":
+                    return (b.title || "").localeCompare(a.title || "", "tr");
+                default:
+                    return 0;
+            }
+        });
+
+        return result;
+    }, [allAnnouncements, pendingAnnouncements, activeTab, searchQuery, sortBy]);
+
+    const isLoading = activeTab === "pending" ? loadingPending : loadingAll;
+
+    // Reset page when filters change
+    const handleSearchChange = (query: string) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
     };
 
-    const filteredAnnouncements = getFilteredAnnouncements();
-    const isLoading = activeTab === "pending" ? loadingPending : loadingAll;
+    const handleSortChange = (sort: string) => {
+        setSortBy(sort as typeof sortBy);
+        setCurrentPage(1);
+    };
+
+    const handleTabChange = (tab: typeof activeTab) => {
+        setActiveTab(tab);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     const handleDelete = async (id: number) => {
         if (window.confirm("Bu duyuruyu silmek istediğinize emin misiniz?")) {
@@ -142,7 +208,7 @@ export default function AnnouncementList() {
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                     <button
-                        onClick={() => setActiveTab("pending")}
+                        onClick={() => handleTabChange("pending")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "pending"
                                 ? "border-indigo-500 text-indigo-600"
@@ -157,7 +223,7 @@ export default function AnnouncementList() {
                         )}
                     </button>
                     <button
-                        onClick={() => setActiveTab("approved")}
+                        onClick={() => handleTabChange("approved")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "approved"
                                 ? "border-emerald-500 text-emerald-600"
@@ -167,7 +233,7 @@ export default function AnnouncementList() {
                         Onaylanan Duyurular
                     </button>
                     <button
-                        onClick={() => setActiveTab("rejected")}
+                        onClick={() => handleTabChange("rejected")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "rejected"
                                 ? "border-red-500 text-red-600"
@@ -177,7 +243,7 @@ export default function AnnouncementList() {
                         Reddedilen Duyurular
                     </button>
                     <button
-                        onClick={() => setActiveTab("all")}
+                        onClick={() => handleTabChange("all")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "all"
                                 ? "border-indigo-500 text-indigo-600"
@@ -189,12 +255,25 @@ export default function AnnouncementList() {
                 </nav>
             </div>
 
+            {/* Search & Sort Controls */}
+            <AdminListControls
+                searchQuery={searchQuery}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder="Duyuru başlığı veya açıklama ile ara..."
+                sortBy={sortBy}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
+                totalCount={allAnnouncements?.length}
+                filteredCount={filteredAndSortedAnnouncements.length}
+            />
+
             {/* Duyuru Listesi */}
             <div>
                 <AnnouncementGridList
-                    announcements={filteredAnnouncements}
+                    announcements={filteredAndSortedAnnouncements}
                     loading={isLoading}
                     emptyMessage={
+                        searchQuery ? "Arama kriterlerine uygun duyuru bulunamadı." :
                         activeTab === "pending" ? "Şu an bekleyen duyuru talebi bulunmamaktadır." :
                         activeTab === "approved" ? "Şu an onaylanmış duyuru bulunmamaktadır." :
                         activeTab === "rejected" ? "Şu an reddedilmiş duyuru bulunmamaktadır." :
@@ -206,6 +285,9 @@ export default function AnnouncementList() {
                     onReject={handleReject}
                     onClick={setSelectedAnnouncement}
                     showAdminActions={true}
+                    currentPage={currentPage}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={handlePageChange}
                 />
             </div>
 

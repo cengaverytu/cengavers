@@ -1,8 +1,9 @@
+import { useState, useMemo } from "react";
 import { usePendingEvents, useEvents, useEvent } from "../../features/event/hooks/useEvent";
 import EventList from "../../features/event/components/EventList";
 import { EventResponse } from "../../features/event/types/event";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import AdminListControls from "../../components/ui/AdminListControls";
 
 export default function AdminEventsPage() {
     const { data: allEvents, isLoading: loadingAll } = useEvents();
@@ -11,6 +12,19 @@ export default function AdminEventsPage() {
     
     const [activeTab, setActiveTab] = useState<"pending" | "approved" | "rejected" | "all">("pending");
     const navigate = useNavigate();
+
+    // Search, Sort, Pagination states
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "title-asc" | "title-desc">("date-desc");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+
+    const sortOptions = [
+        { value: "date-desc", label: "En Yeni" },
+        { value: "date-asc", label: "En Eski" },
+        { value: "title-asc", label: "Başlık (A-Z)" },
+        { value: "title-desc", label: "Başlık (Z-A)" },
+    ];
 
     const handleApprove = async (id: number) => {
         if (!confirm("Bu etkinliği onaylamak istediğinize emin misiniz?")) return;
@@ -38,25 +52,78 @@ export default function AdminEventsPage() {
         navigate(`/events/${event.id}`);
     };
 
-    // Filtreleme
-    const getFilteredEvents = (): EventResponse[] => {
-        const all = allEvents || [];
+    // Filter, Search, Sort
+    const filteredAndSortedEvents = useMemo(() => {
+        let result: EventResponse[] = [];
+        
+        // Tab filter
         switch (activeTab) {
             case "pending":
-                return pendingEvents || [];
+                result = pendingEvents || [];
+                break;
             case "approved":
-                return all.filter((e: EventResponse) => e.status === "APPROVED");
+                result = (allEvents || []).filter((e: EventResponse) => e.status === "APPROVED");
+                break;
             case "rejected":
-                return all.filter((e: EventResponse) => e.status === "REJECTED");
+                result = (allEvents || []).filter((e: EventResponse) => e.status === "REJECTED");
+                break;
             case "all":
-                return all;
+                result = allEvents || [];
+                break;
             default:
-                return pendingEvents || [];
+                result = pendingEvents || [];
         }
+
+        // Search filter
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase().trim();
+            result = result.filter((e: EventResponse) => 
+                e.title?.toLowerCase().includes(query) ||
+                e.description?.toLowerCase().includes(query) ||
+                e.location?.toLowerCase().includes(query)
+            );
+        }
+
+        // Sort
+        result = [...result].sort((a, b) => {
+            switch (sortBy) {
+                case "date-desc":
+                    return new Date(b.eventDate || b.createdAt).getTime() - new Date(a.eventDate || a.createdAt).getTime();
+                case "date-asc":
+                    return new Date(a.eventDate || a.createdAt).getTime() - new Date(b.eventDate || b.createdAt).getTime();
+                case "title-asc":
+                    return (a.title || "").localeCompare(b.title || "", "tr");
+                case "title-desc":
+                    return (b.title || "").localeCompare(a.title || "", "tr");
+                default:
+                    return 0;
+            }
+        });
+
+        return result;
+    }, [allEvents, pendingEvents, activeTab, searchQuery, sortBy]);
+
+    const isLoading = activeTab === "pending" ? loadingPending : loadingAll;
+
+    // Reset page when filters change
+    const handleSearchChange = (query: string) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
     };
 
-    const filteredEvents = getFilteredEvents();
-    const isLoading = activeTab === "pending" ? loadingPending : loadingAll;
+    const handleSortChange = (sort: string) => {
+        setSortBy(sort as typeof sortBy);
+        setCurrentPage(1);
+    };
+
+    const handleTabChange = (tab: typeof activeTab) => {
+        setActiveTab(tab);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -76,10 +143,10 @@ export default function AdminEventsPage() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="border-b border-gray-200 mb-8">
+            <div className="border-b border-gray-200 mb-6">
                 <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                     <button
-                        onClick={() => setActiveTab("pending")}
+                        onClick={() => handleTabChange("pending")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "pending"
                                 ? "border-indigo-500 text-indigo-600"
@@ -94,7 +161,7 @@ export default function AdminEventsPage() {
                         )}
                     </button>
                     <button
-                        onClick={() => setActiveTab("approved")}
+                        onClick={() => handleTabChange("approved")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "approved"
                                 ? "border-emerald-500 text-emerald-600"
@@ -104,7 +171,7 @@ export default function AdminEventsPage() {
                         Onaylanan Etkinlikler
                     </button>
                     <button
-                        onClick={() => setActiveTab("rejected")}
+                        onClick={() => handleTabChange("rejected")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "rejected"
                                 ? "border-red-500 text-red-600"
@@ -114,7 +181,7 @@ export default function AdminEventsPage() {
                         Reddedilen Etkinlikler
                     </button>
                     <button
-                        onClick={() => setActiveTab("all")}
+                        onClick={() => handleTabChange("all")}
                         className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                             activeTab === "all"
                                 ? "border-indigo-500 text-indigo-600"
@@ -126,11 +193,24 @@ export default function AdminEventsPage() {
                 </nav>
             </div>
 
+            {/* Search & Sort Controls */}
+            <AdminListControls
+                searchQuery={searchQuery}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder="Etkinlik başlığı, açıklama veya konum ile ara..."
+                sortBy={sortBy}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
+                totalCount={allEvents?.length}
+                filteredCount={filteredAndSortedEvents.length}
+            />
+
             {/* Etkinlik Listesi */}
             <EventList
-                events={filteredEvents}
+                events={filteredAndSortedEvents}
                 loading={isLoading || isApproving || isRejecting}
                 emptyMessage={
+                    searchQuery ? "Arama kriterlerine uygun etkinlik bulunamadı." :
                     activeTab === "pending" ? "Şu an bekleyen etkinlik talebi bulunmamaktadır." :
                     activeTab === "approved" ? "Şu an onaylanmış etkinlik bulunmamaktadır." :
                     activeTab === "rejected" ? "Şu an reddedilmiş etkinlik bulunmamaktadır." :
@@ -140,8 +220,10 @@ export default function AdminEventsPage() {
                 onReject={handleReject}
                 onClick={handleDetailClick}
                 showAdminActions={true}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
             />
         </div>
     );
 }
-

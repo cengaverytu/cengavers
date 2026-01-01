@@ -9,6 +9,7 @@ import EventForm from "../../features/event/components/EventForm";
 import EventList from "../../features/event/components/EventList";
 import AnnouncementForm from "../../features/announcement/components/AnnouncementForm";
 import AnnouncementGridList from "../../features/announcement/components/AnnouncementGridList";
+import Pagination from "../../components/ui/Pagination";
 import { CreateEventInput, EventResponse, UpdateEventInput } from "../../features/event/types/event";
 import { CreateAnnouncementInput, UpdateAnnouncementInput, AnnouncementDTO } from "../../features/announcement/types/announcement";
 
@@ -33,6 +34,19 @@ export default function ClubManagementPage() {
     const [isCreateAnnouncementModalOpen, setCreateAnnouncementModalOpen] = useState(false);
     const [isEditAnnouncementModalOpen, setEditAnnouncementModalOpen] = useState(false);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementDTO | null>(null);
+
+    // Pagination states
+    const [clubsCurrentPage, setClubsCurrentPage] = useState(1);
+    const [eventsCurrentPage, setEventsCurrentPage] = useState(1);
+    const [announcementsCurrentPage, setAnnouncementsCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+
+    // Pagination calculations
+    const clubsTotalPages = Math.ceil((managedClubs?.length || 0) / itemsPerPage);
+    const paginatedClubs = (managedClubs || []).slice(
+        (clubsCurrentPage - 1) * itemsPerPage,
+        clubsCurrentPage * itemsPerPage
+    );
 
     const handleCreateEvent = async (data: CreateEventInput) => {
         try {
@@ -127,6 +141,14 @@ export default function ClubManagementPage() {
         setEditAnnouncementModalOpen(true);
     };
 
+    // Handle tab change - reset pagination
+    const handleTabChange = (tab: typeof activeTab) => {
+        setActiveTab(tab);
+        setClubsCurrentPage(1);
+        setEventsCurrentPage(1);
+        setAnnouncementsCurrentPage(1);
+    };
+
     if (loadingClubs) {
         return (
             <div className="flex justify-center items-center min-h-screen">
@@ -156,7 +178,7 @@ export default function ClubManagementPage() {
             <div className="border-b border-gray-200 mb-8">
                 <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                     <button
-                        onClick={() => setActiveTab("clubs")}
+                        onClick={() => handleTabChange("clubs")}
                         className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${activeTab === "clubs"
@@ -168,7 +190,7 @@ export default function ClubManagementPage() {
                         Kulüp & Üye Yönetimi
                     </button>
                     <button
-                        onClick={() => setActiveTab("events")}
+                        onClick={() => handleTabChange("events")}
                         className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${activeTab === "events"
@@ -180,7 +202,7 @@ export default function ClubManagementPage() {
                         Etkinlik Yönetimi
                     </button>
                     <button
-                        onClick={() => setActiveTab("announcements")}
+                        onClick={() => handleTabChange("announcements")}
                         className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${activeTab === "announcements"
@@ -197,9 +219,14 @@ export default function ClubManagementPage() {
             {/* Kulüp & Üye Yönetimi Tab */}
             {activeTab === "clubs" && (
                 <div className="space-y-8">
-                    {managedClubs.map((club) => (
+                    {paginatedClubs.map((club) => (
                         <ClubManager key={club.id} club={club} />
                     ))}
+                    <Pagination
+                        currentPage={clubsCurrentPage}
+                        totalPages={clubsTotalPages}
+                        onPageChange={setClubsCurrentPage}
+                    />
                 </div>
             )}
 
@@ -247,6 +274,9 @@ export default function ClubManagementPage() {
                             onDelete={handleDeleteEvent}
                             onClick={handleDetailClick}
                             showActions={true}
+                            currentPage={eventsCurrentPage}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setEventsCurrentPage}
                         />
                     </div>
                 </div>
@@ -295,6 +325,9 @@ export default function ClubManagementPage() {
                             onEdit={handleEditAnnouncementClick}
                             onDelete={handleDeleteAnnouncement}
                             showActions={true}
+                            currentPage={announcementsCurrentPage}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setAnnouncementsCurrentPage}
                         />
                     </div>
                 </div>
