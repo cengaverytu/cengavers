@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMessages } from "../../features/message/hooks/useMessage.ts";
-import { usePublicClubs } from "../../features/club/hooks/useClub";
+import { usePublicClubs, useJoinedClubs } from "../../features/club/hooks/useClub";
 import { useApprovedEvents } from "../../features/event/hooks/useEvent";
 import { useAuthUser } from "../../features/auth/hooks/useAuth";
 import UserAnnouncementsPage from "./UserAnnouncementsPage.tsx";
@@ -22,8 +22,9 @@ function ClubsListWithPagination({
   onPageChange: (page: number) => void;
   onClubClick: (clubId: number) => void;
 }) {
-  const totalPages = Math.ceil(clubs.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const totalPages = Math.max(1, Math.ceil(clubs.length / itemsPerPage));
+  const validPage = Math.max(1, Math.min(Math.max(1, currentPage), totalPages));
+  const startIndex = (validPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedClubs = clubs.slice(startIndex, endIndex);
 
@@ -59,8 +60,8 @@ function ClubsListWithPagination({
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
           <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={() => onPageChange(validPage - 1)}
+            disabled={validPage === 1}
             className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Önceki
@@ -71,14 +72,14 @@ function ClubsListWithPagination({
               if (
                 page === 1 ||
                 page === totalPages ||
-                (page >= currentPage - 1 && page <= currentPage + 1)
+                (page >= validPage - 1 && page <= validPage + 1)
               ) {
                 return (
                   <button
                     key={page}
                     onClick={() => onPageChange(page)}
                     className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      currentPage === page
+                      validPage === page
                         ? "bg-indigo-600 text-white"
                         : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
                     }`}
@@ -87,8 +88,8 @@ function ClubsListWithPagination({
                   </button>
                 );
               } else if (
-                page === currentPage - 2 ||
-                page === currentPage + 2
+                page === validPage - 2 ||
+                page === validPage + 2
               ) {
                 return (
                   <span key={page} className="px-2 text-gray-500">
@@ -100,8 +101,8 @@ function ClubsListWithPagination({
             })}
           </div>
           <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            onClick={() => onPageChange(validPage + 1)}
+            disabled={validPage === totalPages}
             className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Sonraki
@@ -118,6 +119,7 @@ export default function HomePage() {
   const { data: events } = useApprovedEvents();
   const { data: messages } = useMessages();
   const { data: me, isLoading: isLoadingAuth } = useAuthUser();
+  const { data: joinedClubs } = useJoinedClubs(!!me);
   const activeMessage = messages?.find(m => m.status === true);
   const activeClubs = clubs || [];
   const upcomingEvents = events || [];
@@ -125,6 +127,8 @@ export default function HomePage() {
   // Pagination states
   const [eventsCurrentPage, setEventsCurrentPage] = useState<number>(1);
   const [clubsCurrentPage, setClubsCurrentPage] = useState<number>(1);
+  const [clubsSearchQuery, setClubsSearchQuery] = useState<string>("");
+  const [clubsFilterType, setClubsFilterType] = useState<"all" | "my">("all");
   const eventsItemsPerPage = 3;
   const clubsItemsPerPage = 3;
   
@@ -137,9 +141,82 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Clubs filtering logic - MUST be defined before pagination logic
+  const joinedClubIds = useMemo(() => {
+    return (joinedClubs || []).map(c => c.id);
+  }, [joinedClubs]);
+
+  const filteredClubs = useMemo((): ClubResponse[] => {
+    try {
+      let filtered: ClubResponse[] = [];
+      
+      // Apply filter type
+      if (clubsFilterType === "my" && isAuthenticated) {
+        filtered = activeClubs.filter(c => joinedClubIds.includes(c.id));
+      } else {
+        filtered = [...activeClubs];
+      }
+
+      // Search filter
+      if (clubsSearchQuery.trim()) {
+        const query = clubsSearchQuery.toLowerCase().trim();
+        filtered = filtered.filter(club => 
+          club?.name?.toLowerCase().includes(query)
+        );
+      }
+
+      return filtered;
+    } catch (error) {
+      console.error("Error filtering clubs:", error);
+      return [];
+    }
+  }, [activeClubs, clubsFilterType, clubsSearchQuery, isAuthenticated, joinedClubIds]);
+
+  // Pagination logic for clubs - AFTER filteredClubs is defined
+  const clubsTotalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredClubs.length / clubsItemsPerPage));
+  }, [filteredClubs.length, clubsItemsPerPage]);
+
+  const validClubsCurrentPage = useMemo(() => {
+    if (clubsTotalPages === 0) return 1;
+    if (clubsCurrentPage > clubsTotalPages) return clubsTotalPages;
+    if (clubsCurrentPage < 1) return 1;
+    return clubsCurrentPage;
+  }, [clubsCurrentPage, clubsTotalPages]);
+
   const handleClubsPageChange = (page: number) => {
-    setClubsCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (page >= 1 && page <= clubsTotalPages) {
+      setClubsCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Sync clubsCurrentPage if it's invalid (only when totalPages changes)
+  useEffect(() => {
+    if (clubsTotalPages > 0 && clubsCurrentPage > clubsTotalPages) {
+      setClubsCurrentPage(clubsTotalPages);
+    }
+  }, [clubsTotalPages]); // Only depend on clubsTotalPages, not clubsCurrentPage
+
+  const handleClubsSearchChange = (query: string) => {
+    setClubsCurrentPage(1);
+    setClubsSearchQuery(query);
+  };
+
+  const handleClubsFilterChange = (filter: "all" | "my") => {
+    setClubsCurrentPage(1);
+    setClubsFilterType(filter);
+  };
+
+  const getClubsEmptyMessage = () => {
+    if (clubsSearchQuery.trim() && clubsFilterType === "my") {
+      return "Üye olduğunuz kulüpler arasında arama kriterlerine uygun kulüp bulunamadı.";
+    } else if (clubsSearchQuery.trim()) {
+      return "Arama kriterlerine uygun kulüp bulunamadı.";
+    } else if (clubsFilterType === "my") {
+      return "Henüz üye olduğunuz bir kulüp bulunmuyor.";
+    }
+    return "Henüz aktif bir kulüp bulunmuyor.";
   };
 
   return (
@@ -240,17 +317,69 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Aktif Kulüpler</h2>
           <p className="text-gray-600 mb-8">Kampüsümüzdeki aktif kulüpleri keşfedin</p>
           
-          {activeClubs.length === 0 ? (
+          {/* Search and Filter Section */}
+          <div className="mb-6 space-y-4">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
+              {/* Search Filter */}
+              <div className="flex-1 min-w-[200px]">
+                <label htmlFor="home-club-search" className="block text-sm font-medium text-gray-700 mb-2">
+                  Arama
+                </label>
+                <div className="relative">
+                  <input
+                    id="home-club-search"
+                    type="text"
+                    value={clubsSearchQuery}
+                    onChange={(e) => handleClubsSearchChange(e.target.value)}
+                    placeholder="Kulüp adı ile ara..."
+                    className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Filter Dropdown */}
+              {isAuthenticated && (
+                <div className="min-w-[200px]">
+                  <label htmlFor="home-club-filter" className="block text-sm font-medium text-gray-700 mb-2">
+                    Filtre
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="home-club-filter"
+                      value={clubsFilterType}
+                      onChange={(e) => handleClubsFilterChange(e.target.value as "all" | "my")}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 appearance-none cursor-pointer"
+                    >
+                      <option value="all">Hepsi</option>
+                      <option value="my">Sadece üyelerim</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {filteredClubs.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
               <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <p className="text-gray-500 text-lg">Henüz aktif bir kulüp bulunmuyor.</p>
+              <p className="text-gray-500 text-lg font-medium">{getClubsEmptyMessage()}</p>
             </div>
           ) : (
             <ClubsListWithPagination
-              clubs={activeClubs}
-              currentPage={clubsCurrentPage}
+              clubs={filteredClubs}
+              currentPage={validClubsCurrentPage}
               itemsPerPage={clubsItemsPerPage}
               onPageChange={handleClubsPageChange}
               onClubClick={(clubId) => navigate(`/clubs/${clubId}`)}
