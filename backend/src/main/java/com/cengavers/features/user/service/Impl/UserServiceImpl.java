@@ -1,6 +1,5 @@
 package com.cengavers.features.user.service.Impl;
 
-
 import com.cengavers.features.role.entity.Role;
 import com.cengavers.features.role.repository.RoleRepository;
 import com.cengavers.features.role.service.RoleService;
@@ -34,8 +33,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void save(CreateUserRequest request) {
-        if(userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException( "Username already exists : "+request.getUsername());
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists : " + request.getUsername());
         }
         Role role = roleService.findByRoleName("user");
         User user = new User();
@@ -45,9 +44,10 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
     }
+
     public void saveAdmin(CreateUserRequest request) {
-        if(userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException( "Username already exists : "+request.getUsername());
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists : " + request.getUsername());
         }
         Role role = roleService.findByRoleName("admin");
         User user = new User();
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
         if (request.getRoleId() != null) {
             var role = roleRepository.findById(request.getRoleId())
-                    .orElseThrow(() -> new RuntimeException( "Role not found id=" + request.getRoleId()));
+                    .orElseThrow(() -> new RuntimeException("Role not found id=" + request.getRoleId()));
             user.setRole(role);
         }
 
@@ -113,7 +113,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException( "User cannot found to delete with id: " + id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User cannot found to delete with id: " + id));
         userRepository.delete(user);
     }
 
@@ -124,35 +125,51 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsernameReturnUser(String username) {
-        return userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException( "User not found by username : " + username));
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found by username : " + username));
     }
 
     @Override
     public UserDTO findByUserId(Long id) {
         return userDTOConverter.convert(
-                userRepository.findById(id).orElseThrow(()-> new RuntimeException("User Not Found: " + id)));
+                userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found: " + id)));
     }
 
     @Override
     public UserDTO findByUsername(String username) {
         return userDTOConverter.convert(
-                userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException( "User Not Found: " + username))
-        );
+                userRepository.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("User Not Found: " + username)));
     }
 
     @Override
     public UserDTO getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || authentication.getName() == null || "anonymousUser".equals(authentication.getName())) {
-            throw new RuntimeException( "No authenticated user");
+        if (authentication == null || authentication.getName() == null
+                || "anonymousUser".equals(authentication.getName())) {
+            throw new RuntimeException("No authenticated user");
         }
         var user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new RuntimeException( "User Not Found: " + authentication.getName()));
+                .orElseThrow(() -> new RuntimeException("User Not Found: " + authentication.getName()));
         return userDTOConverter.convert(user);
     }
 
     @Override
     public boolean existByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public void updateUserRole(Long userId, Long roleId) {
+        if (roleId == null) {
+            throw new RuntimeException("Role ID cannot be null");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found id: " + userId));
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found id: " + roleId));
+        user.setRole(role);
+        userRepository.save(user);
     }
 }

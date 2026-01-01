@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { 
-    getAllClubs, 
-    getJoinedClubs, 
-    createClub, 
-    joinClub, 
-    leaveClub, 
+import {
+    getAllClubs,
+    getJoinedClubs,
+    createClub,
+    joinClub,
+    leaveClub,
     getClubMembers,
     approveMembership,
     rejectMembership,
@@ -15,7 +15,8 @@ import {
     assignRole,
     getManagedClubs,
     getPublicClubs,
-    getClubById
+    getClubById,
+    removeMember
 } from "../api/clubApi";
 import { CreateClubRequest, CreateClubRoleRequest } from "../types/club";
 
@@ -122,7 +123,7 @@ export function useApproveMembership() {
     return useMutation({
         mutationFn: (id: number) => approveMembership(id),
         onSuccess: (_data, _variables, context) => {
-             qc.invalidateQueries({ queryKey: ["clubs"] }); 
+            qc.invalidateQueries({ queryKey: ["clubs"] });
         },
     });
 }
@@ -132,7 +133,7 @@ export function useRejectMembership() {
     return useMutation({
         mutationFn: (id: number) => rejectMembership(id),
         onSuccess: () => {
-             qc.invalidateQueries({ queryKey: ["clubs"] });
+            qc.invalidateQueries({ queryKey: ["clubs"] });
         },
     });
 }
@@ -172,8 +173,20 @@ export function useAssignRole() {
     return useMutation({
         mutationFn: (vars: { memberId: number, roleId: number, clubId: number }) => assignRole(vars.memberId, vars.roleId),
         onSuccess: (_data, variables) => {
-             qc.invalidateQueries({ queryKey: CLUB_KEYS.members(variables.clubId) });
-             qc.invalidateQueries({ queryKey: CLUB_KEYS.myManaged });
+            qc.invalidateQueries({ queryKey: CLUB_KEYS.members(variables.clubId) });
+            qc.invalidateQueries({ queryKey: CLUB_KEYS.myManaged });
+        },
+    });
+}
+
+export function useRemoveMember() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (vars: { memberId: number, clubId: number }) => removeMember(vars.memberId),
+        onSuccess: (_data, variables) => {
+            qc.invalidateQueries({ queryKey: CLUB_KEYS.members(variables.clubId) });
+            qc.invalidateQueries({ queryKey: CLUB_KEYS.myManaged });
+            qc.invalidateQueries({ queryKey: CLUB_KEYS.all });
         },
     });
 }

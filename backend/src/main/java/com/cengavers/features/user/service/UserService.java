@@ -1,8 +1,5 @@
 package com.cengavers.features.user.service;
 
-
-
-
 import com.cengavers.features.user.dto.UserDTO;
 import com.cengavers.features.user.dto.request.CreateUserRequest;
 import com.cengavers.features.user.dto.request.UpdateUserRequest;
@@ -31,4 +28,6 @@ public interface UserService {
     UserDTO getCurrentUser();
 
     boolean existByUsername(String username);
+
+    void updateUserRole(Long userId, Long roleId);
 }
