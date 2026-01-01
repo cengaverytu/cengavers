@@ -33,3 +33,7 @@ export async function updateUser(id: number, data: UpdateUserRequest): Promise<U
     return res.data;
 }
 
+export async function updateUserRole(userId: number, roleId: number): Promise<void> {
+    await http.put<void>(`/users/${userId}/role`, { roleId });
+}
+
