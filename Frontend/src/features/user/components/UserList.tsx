@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAllUsers, useDeleteUser } from "../hooks/useUser";
+import { useAllUsers, useDeleteUser, useUpdateUserRole } from "../hooks/useUser";
 import { useRoles } from "../../role/hooks/useRole";
 import { User } from "../types/user";
 import Pagination from "../../../components/ui/Pagination";
@@ -16,6 +16,7 @@ export default function UserList() {
     const { data: users, isLoading: usersLoading, error: usersError } = useAllUsers();
     const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles();
     const deleteUserMutation = useDeleteUser();
+    const updateRoleMutation = useUpdateUserRole();
 
     // Filter, Search, Sort
     const filteredAndSortedUsers = useMemo(() => {
@@ -86,6 +87,20 @@ export default function UserList() {
                 console.error("Kullanıcı silinirken hata oluştu:", error);
                 alert("Kullanıcı silinirken bir hata oluştu");
             }
+        }
+    };
+
+    const handleRoleUpdate = async (userId: number, newRoleId: number) => {
+        if (!newRoleId) {
+            alert("Lütfen geçerli bir rol seçin");
+            return;
+        }
+        try {
+            await updateRoleMutation.mutateAsync({ userId, roleId: newRoleId });
+            alert("Kullanıcının rolü başarıyla güncellendi");
+        } catch (error: any) {
+            console.error("Rol güncellenirken hata oluştu:", error);
+            alert(error?.response?.data?.message || "Rol güncellenirken bir hata oluştu");
         }
     };
 
@@ -260,11 +275,29 @@ export default function UserList() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getRoleColor(user.roleId)}`}
-                                                >
-                                                    {getRoleName(user.roleId)}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span
+                                                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getRoleColor(user.roleId)}`}
+                                                    >
+                                                        {getRoleName(user.roleId)}
+                                                    </span>
+                                                    <select
+                                                        className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                                        value=""
+                                                        onChange={(e) => {
+                                                            const newRoleId = Number(e.target.value);
+                                                            if (newRoleId && newRoleId !== user.roleId) {
+                                                                handleRoleUpdate(user.id, newRoleId);
+                                                            }
+                                                        }}
+                                                        disabled={updateRoleMutation.isPending}
+                                                    >
+                                                        <option value="">Rol Değiştir</option>
+                                                        {roles?.filter(r => r.id !== user.roleId).map(role => (
+                                                            <option key={role.id} value={role.id}>{role.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {formatDate(user.createdAt)}
