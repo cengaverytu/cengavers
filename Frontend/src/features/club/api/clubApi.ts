@@ -1,10 +1,10 @@
 import { http } from "../../../lib/http";
-import { 
-    ClubResponse, 
-    CreateClubRequest, 
-    ClubMemberResponse, 
-    CreateClubRoleRequest, 
-    ClubRoleResponse 
+import {
+    ClubResponse,
+    CreateClubRequest,
+    ClubMemberResponse,
+    CreateClubRoleRequest,
+    ClubRoleResponse
 } from "../types/club";
 
 export async function createClub(data: CreateClubRequest): Promise<ClubResponse> {
@@ -79,4 +79,8 @@ export async function assignRole(memberId: number, roleId: number): Promise<void
 export async function getClubById(id: number): Promise<ClubResponse> {
     const res = await http.get<ClubResponse>(`/club/${id}`);
     return res.data;
+}
+
+export async function removeMember(memberId: number): Promise<void> {
+    await http.delete<void>(`/club/member/${memberId}`);
 }

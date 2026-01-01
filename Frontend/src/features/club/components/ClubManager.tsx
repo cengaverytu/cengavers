@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ClubResponse } from "../types/club";
-import { useClubMembers, useClubRoles, useApproveMembership, useRejectMembership, useCreateClubRole, useAssignRole } from "../hooks/useClub";
+import { useClubMembers, useClubRoles, useApproveMembership, useRejectMembership, useCreateClubRole, useAssignRole, useRemoveMember } from "../hooks/useClub";
 import Modal from "../../../components/ui/Modal";
 import CreateRoleForm from "./CreateRoleForm";
 
@@ -16,6 +16,7 @@ export default function ClubManager({ club }: Props) {
     const { mutate: rejectMember } = useRejectMembership();
     const { mutateAsync: createRole } = useCreateClubRole();
     const { mutate: assignRole } = useAssignRole();
+    const { mutate: removeMember, isPending: isRemoving } = useRemoveMember();
 
     const [isRoleModalOpen, setRoleModalOpen] = useState(false);
 
@@ -113,21 +114,38 @@ export default function ClubManager({ club }: Props) {
                                             {member.roleName || "-"}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <select
-                                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                                defaultValue=""
-                                                onChange={(e) => {
-                                                    const roleId = Number(e.target.value);
-                                                    if (roleId) {
-                                                        assignRole({ memberId: member.id, roleId, clubId: club.id });
-                                                    }
-                                                }}
-                                            >
-                                                <option value="" disabled>Rol Ata</option>
-                                                {roles?.map(role => (
-                                                    <option key={role.id} value={role.id}>{role.name}</option>
-                                                ))}
-                                            </select>
+                                            <div className="flex items-center gap-2">
+                                                <select
+                                                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                                                    defaultValue=""
+                                                    onChange={(e) => {
+                                                        const roleId = Number(e.target.value);
+                                                        if (roleId) {
+                                                            assignRole({ memberId: member.id, roleId, clubId: club.id });
+                                                        }
+                                                    }}
+                                                >
+                                                    <option value="" disabled>Rol Ata</option>
+                                                    {roles?.map(role => (
+                                                        <option key={role.id} value={role.id}>{role.name}</option>
+                                                    ))}
+                                                </select>
+                                                {/* Kulübün kurucusu çıkartılamaz */}
+                                                {member.username !== club.ownerUsername && (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm(`${member.username} adlı üyeyi kulüpten çıkartmak istediğinize emin misiniz?`)) {
+                                                                removeMember({ memberId: member.id, clubId: club.id });
+                                                            }
+                                                        }}
+                                                        disabled={isRemoving}
+                                                        className="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 transition-colors"
+                                                        title="Üyeyi Çıkart"
+                                                    >
+                                                        Çıkart
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

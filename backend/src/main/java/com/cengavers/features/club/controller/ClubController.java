@@ -107,5 +107,10 @@ public class ClubController {
         clubService.assignRole(memberId, roleId);
         return ResponseEntity.ok().build();
     }
-}
 
+    @DeleteMapping("/member/{memberId}")
+    public ResponseEntity<Void> removeMember(@PathVariable Long memberId) {
+        clubService.removeMember(memberId);
+        return ResponseEntity.ok().build();
+    }
+}
